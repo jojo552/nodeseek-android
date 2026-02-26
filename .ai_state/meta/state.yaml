@@ -1,0 +1,31 @@
+project: nodeseek-android
+updated_at: 2026-02-25
+branch: main
+mode: userscript_single_runtime
+
+source_of_truth:
+  userscript_modules_dir: userscripts/src
+  generated_asset_path: app/build/generated/userscripts/assets/userscripts/nodeseek-pro.user.js
+  runtime_asset_path: userscripts/nodeseek-pro.user.js
+  runtime_loader: app/src/main/java/com/nodeseek/app/NodeseekUserscriptRuntime.java
+  build_orchestrator: app/build.gradle
+
+recent_commits:
+  - hash: b6d184b
+    summary: build output moved to build/generated; removed source asset file
+  - hash: 9b64f59
+    summary: README clarified single-script runtime behavior
+  - hash: a788c5b
+    summary: docs expanded file responsibilities and load flow
+
+active_workstreams:
+  - ai_state_refactor
+  - userscript_pipeline_stability
+
+open_risks:
+  - External dependency availability for layui/highlight resources
+  - Lack of automated runtime smoke verification on real devices
+
+next_actions:
+  - Add CI guard for :app:assembleUserscriptSource
+  - Define release smoke checklist for userscript injection

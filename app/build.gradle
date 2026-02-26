@@ -1,0 +1,165 @@
+plugins {
+    id "com.android.application"
+}
+
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
+def baseVersionName = "1.0.11"
+def baseVersionCode = 12
+def ciRunNumber = System.getenv("GITHUB_RUN_NUMBER")
+def ciSha = System.getenv("GITHUB_SHA")
+def isCi = ciRunNumber != null && ciRunNumber.isInteger()
+
+def readCmdOutput = { List<String> cmd ->
+    try {
+        def stdout = new ByteArrayOutputStream()
+        exec {
+            commandLine cmd
+            standardOutput = stdout
+            errorOutput = new ByteArrayOutputStream()
+            ignoreExitValue true
+        }
+        return stdout.toString().trim()
+    } catch (Exception ignored) {
+        return ""
+    }
+}
+
+def generatedUserscriptAssetsDir = file("$buildDir/generated/userscripts/assets")
+def userscriptDir = file("${generatedUserscriptAssetsDir}/userscripts")
+def userscriptSource = file("${userscriptDir}/nodeseek-pro.user.js")
+def userscriptSourceModuleDir = rootProject.file("userscripts/src")
+def userscriptSourceModules = [
+    file("${userscriptSourceModuleDir}/00-core-runtime.js"),
+    file("${userscriptSourceModuleDir}/10-feature-content-tools.js"),
+    file("${userscriptSourceModuleDir}/20-feature-settings-menu.js"),
+    file("${userscriptSourceModuleDir}/30-feature-reputation.js"),
+    file("${userscriptSourceModuleDir}/40-feature-social-relation.js")
+]
+
+def normalizeLf = { String s ->
+    if (s == null) return ""
+    return s.replace("\r\n", "\n").replace("\r", "\n")
+}
+
+tasks.register("assembleUserscriptSource") {
+    group = "build setup"
+    description = "Assemble userscript source modules into generated assets userscripts/nodeseek-pro.user.js."
+    inputs.files(userscriptSourceModules)
+    outputs.file(userscriptSource)
+
+    doLast {
+        def missing = userscriptSourceModules.findAll { !it.exists() }
+        if (!missing.isEmpty()) {
+            throw new GradleException("Userscript source modules missing: ${missing*.path.join(', ')}")
+        }
+
+        def mergedSource = userscriptSourceModules.collect { moduleFile ->
+            def text = normalizeLf(moduleFile.getText("UTF-8"))
+            text.endsWith("\n") ? text : (text + "\n")
+        }.join("")
+
+        userscriptSource.parentFile?.mkdirs()
+        userscriptSource.setText(mergedSource, "UTF-8")
+    }
+}
+
+def getGitCommitCount = {
+    def v = readCmdOutput(["git", "rev-list", "--count", "HEAD"])
+    return v != null && v.isInteger() ? v.toInteger() : 0
+}
+
+def getShortSha = {
+    if (ciSha != null && !ciSha.trim().isEmpty()) {
+        return ciSha.trim().take(7)
+    }
+    def v = readCmdOutput(["git", "rev-parse", "--short", "HEAD"])
+    return v ?: ""
+}
+
+def buildNumber = 0
+if (isCi) {
+    buildNumber = ciRunNumber.toInteger()
+} else {
+    buildNumber = getGitCommitCount()
+}
+
+def epochSeconds = (System.currentTimeMillis() / 1000L).toLong()
+def resolvedVersionCode = epochSeconds > Integer.MAX_VALUE ? Integer.MAX_VALUE : epochSeconds.toInteger()
+def resolvedVersionName = baseVersionName
+def shortSha = getShortSha()
+if (buildNumber > 0) {
+    resolvedVersionName = "${baseVersionName}+${buildNumber}"
+}
+if (!isCi) {
+    // 本地构建：即使不提交代码，也能保证每次构建版本名变化，便于安装覆盖与排查缓存
+    resolvedVersionName = "${resolvedVersionName}.t${epochSeconds}"
+}
+if (shortSha != null && !shortSha.isEmpty()) {
+    resolvedVersionName = "${resolvedVersionName}-${shortSha}"
+}
+
+android {
+    namespace "com.nodeseek.app"
+    compileSdk 36
+
+    sourceSets {
+        main {
+            assets.srcDir(generatedUserscriptAssetsDir)
+        }
+    }
+
+    defaultConfig {
+        applicationId "com.nodeseek.app"
+        minSdk 29
+        targetSdk 36
+        versionCode resolvedVersionCode
+        versionName resolvedVersionName
+    }
+
+    signingConfigs {
+        release {
+            if (keystorePropertiesFile.exists()) {
+                def resolvedStoreType = keystoreProperties["storeType"]
+                if (resolvedStoreType != null && !resolvedStoreType.toString().trim().isEmpty()) {
+                    storeType resolvedStoreType.toString().trim()
+                }
+                storeFile rootProject.file(keystoreProperties["storeFile"])
+                storePassword keystoreProperties["storePassword"]
+                keyAlias keystoreProperties["keyAlias"]
+                keyPassword keystoreProperties["keyPassword"]
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            if (keystorePropertiesFile.exists()) {
+                signingConfig signingConfigs.release
+            }
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+tasks.named("preBuild") {
+    dependsOn(tasks.named("assembleUserscriptSource"))
+}
+
+dependencies {
+    implementation "androidx.core:core:1.13.1"
+    implementation "androidx.drawerlayout:drawerlayout:1.2.0"
+    implementation "androidx.recyclerview:recyclerview:1.3.2"
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
+    implementation "org.jsoup:jsoup:1.18.1"
+}

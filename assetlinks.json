@@ -1,0 +1,10 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.nodeseek.app",
+      "sha256_cert_fingerprints": ["D8:2C:38:3D:F5:9A:C1:82:86:8B:28:E6:3A:35:AE:8F:A7:08:07:18:B0:3E:DA:65:58:22:31:2D:2A:76:36:23"]
+    }
+  }
+]

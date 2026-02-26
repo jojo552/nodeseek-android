@@ -1,0 +1,4 @@
+status: idle
+owner: ""
+updated_at: 2026-02-25
+notes: "No active lock. Acquire before long-running multi-step changes."

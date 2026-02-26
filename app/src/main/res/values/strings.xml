@@ -1,0 +1,29 @@
+<resources>
+    <string name="app_name">nodeseek</string>
+    <string name="nav_all">全部</string>
+    <string name="nav_daily">日常</string>
+    <string name="nav_tech">技术</string>
+    <string name="nav_info">情报</string>
+    <string name="nav_review">测评</string>
+    <string name="nav_trade">交易</string>
+    <string name="drawer_home">首页</string>
+    <string name="drawer_subtitle">网页模式 + Nodeseek Pro（含移动端适配）</string>
+    <string name="action_open_menu">打开菜单</string>
+    <string name="action_back">返回</string>
+    <string name="action_search">搜索</string>
+    <string name="action_more">更多</string>
+    <string name="action_open_external">浏览器打开</string>
+    <string name="action_login">登录</string>
+    <string name="search_hint">输入关键词</string>
+    <string name="menu_reload">刷新</string>
+    <string name="menu_open_browser">浏览器打开</string>
+    <string name="menu_login">登录 NodeSeek</string>
+    <string name="loading_posts">正在加载页面…</string>
+    <string name="empty_posts">页面暂不可用</string>
+    <string name="error_load_posts">加载失败：%1$s</string>
+    <string name="detail_loading">正在加载正文…</string>
+    <string name="detail_error">加载正文失败：%1$s</string>
+    <string name="detail_unknown_title">帖子详情</string>
+    <string name="detail_meta_template">%1$s · %2$s</string>
+    <string name="detail_fallback_text">该帖子正文暂未收录到 RSS，请点右上角在浏览器中查看完整内容。</string>
+</resources>

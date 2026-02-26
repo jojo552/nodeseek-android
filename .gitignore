@@ -1,0 +1,16 @@
+# Local SDK config
+local.properties
+
+# Keystore
+keystore.properties
+keystore/
+*.jks
+
+# Build artifacts and caches
+.gradle/
+build/
+app/build/
+
+# IDE files
+*.iml
+.idea/
