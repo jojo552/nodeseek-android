@@ -2787,6 +2787,35 @@ body.dark-layout .nsx-sheet-item[data-a="filter"] .nsx-sheet-item-icon,html.dark
                     }
                 });
             };
+            const getKeyboardInset = () => {
+                const vv = window.visualViewport;
+                if (!vv) return 0;
+                const layoutH = window.innerHeight || document.documentElement?.clientHeight || 0;
+                if (!layoutH) return 0;
+                const inset = Math.round(layoutH - (Number(vv.height || 0) + Number(vv.offsetTop || 0)));
+                return Math.max(0, inset);
+            };
+            const syncDockedEditorBottom = () => {
+                if (!open) return;
+                if (!isSmallScreen(768)) return;
+                if (!editor.classList.contains("nsx-mobile-docked-editor")) return;
+                const inset = getKeyboardInset();
+                try { editor.style.setProperty("bottom", `${inset}px`, "important"); } catch { }
+            };
+            const bindDockedKeyboardAvoid = () => {
+                if (editor.dataset.nsxKeyboardAvoidBound === "1") return;
+                editor.dataset.nsxKeyboardAvoidBound = "1";
+                const onViewportChange = () => {
+                    if (!open) return;
+                    syncDockedEditorBottom();
+                };
+                try { window.visualViewport?.addEventListener("resize", onViewportChange, { passive: true }); } catch { }
+                try { window.visualViewport?.addEventListener("scroll", onViewportChange, { passive: true }); } catch { }
+                try { window.addEventListener("resize", onViewportChange, { passive: true }); } catch { }
+                try { window.addEventListener("orientationchange", onViewportChange, { passive: true }); } catch { }
+                try { editor.addEventListener("focusin", onViewportChange, true); } catch { }
+                try { editor.addEventListener("focusout", () => setTimeout(onViewportChange, 80), true); } catch { }
+            };
 
             const show = e => {
                 if (open) return;
@@ -2802,8 +2831,12 @@ body.dark-layout .nsx-sheet-item[data-a="filter"] .nsx-sheet-item-icon,html.dark
                     editor.classList.remove("nsx-mobile-docked-editor");
                     editor.style.cssText = `position:fixed;bottom:0;left:50%;transform:translateX(-50%);margin:0;width:100%;max-width:${editor.clientWidth || 720}px;z-index:999`;
                 }
-                addClose();
                 open = true;
+                bindDockedKeyboardAvoid();
+                syncDockedEditorBottom();
+                try { requestAnimationFrame(syncDockedEditorBottom); } catch { }
+                try { setTimeout(syncDockedEditorBottom, 120); } catch { }
+                addClose();
             };
 
             const btn = parent.cloneNode(true);
@@ -2835,6 +2868,7 @@ body.dark-layout .nsx-sheet-item[data-a="filter"] .nsx-sheet-item-icon,html.dark
                     else editor.removeAttribute("style");
                     cb.remove();
                     open = false;
+                    try { editor.style.removeProperty("bottom"); } catch { }
                 };
                 tb.after(cb);
             }
