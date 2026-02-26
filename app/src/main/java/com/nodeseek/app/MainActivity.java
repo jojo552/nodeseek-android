@@ -246,6 +246,8 @@ public class MainActivity extends Activity {
         ViewCompat.setOnApplyWindowInsetsListener(rootContainer, (view, insets) -> {
             Insets statusBarInsets = insets.getInsets(WindowInsetsCompat.Type.statusBars());
             Insets navigationBarInsets = insets.getInsets(WindowInsetsCompat.Type.navigationBars());
+            Insets imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime());
+            int bottomInset = Math.max(navigationBarInsets.bottom, imeInsets.bottom);
 
             ViewGroup.LayoutParams params = statusBarScrim.getLayoutParams();
             if (params != null && params.height != statusBarInsets.top) {
@@ -257,7 +259,7 @@ public class MainActivity extends Activity {
                 swipeRefreshLayout.getPaddingLeft(),
                 swipeRefreshBaseTopPadding + statusBarInsets.top,
                 swipeRefreshLayout.getPaddingRight(),
-                swipeRefreshBaseBottomPadding + navigationBarInsets.bottom
+                swipeRefreshBaseBottomPadding + bottomInset
             );
             return insets;
         });

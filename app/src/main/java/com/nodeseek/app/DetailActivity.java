@@ -76,6 +76,8 @@ public class DetailActivity extends Activity {
         ViewCompat.setOnApplyWindowInsetsListener(detailRoot, (view, insets) -> {
             Insets statusInsets = insets.getInsets(WindowInsetsCompat.Type.statusBars());
             Insets navInsets = insets.getInsets(WindowInsetsCompat.Type.navigationBars());
+            Insets imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime());
+            int bottomInset = Math.max(navInsets.bottom, imeInsets.bottom);
             ViewGroup.LayoutParams params = statusBarScrim.getLayoutParams();
             if (params != null && params.height != statusInsets.top) {
                 params.height = statusInsets.top;
@@ -85,7 +87,7 @@ public class DetailActivity extends Activity {
                 view.getPaddingLeft(),
                 view.getPaddingTop(),
                 view.getPaddingRight(),
-                navInsets.bottom
+                bottomInset
             );
             return insets;
         });
