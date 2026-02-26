@@ -3,10 +3,13 @@ package com.nodeseek.app;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.window.OnBackInvokedCallback;
+import android.window.OnBackInvokedDispatcher;
 import android.webkit.CookieManager;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
@@ -34,6 +37,7 @@ public class DetailActivity extends Activity {
     private TextView loadingView;
     private WebView webView;
     private String initialUrl;
+    private OnBackInvokedCallback backInvokedCallback;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +64,7 @@ public class DetailActivity extends Activity {
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         applyInsets();
         setupWebView();
+        registerBackNavigationCallback();
 
         backButton.setOnClickListener(v -> onBackPressedCompat());
         externalButton.setOnClickListener(v -> openExternalCurrentUrl());
@@ -172,6 +177,12 @@ public class DetailActivity extends Activity {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
+    public void onBackPressed() {
+        onBackPressedCompat();
+    }
+
+    @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             onBackPressedCompat();
@@ -180,8 +191,42 @@ public class DetailActivity extends Activity {
         return super.onKeyDown(keyCode, event);
     }
 
+    private void registerBackNavigationCallback() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            return;
+        }
+        if (backInvokedCallback != null) {
+            return;
+        }
+        backInvokedCallback = this::onBackPressedCompat;
+        try {
+            getOnBackInvokedDispatcher().registerOnBackInvokedCallback(
+                OnBackInvokedDispatcher.PRIORITY_DEFAULT,
+                backInvokedCallback
+            );
+        } catch (Throwable ignored) {
+            backInvokedCallback = null;
+        }
+    }
+
+    private void unregisterBackNavigationCallback() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            return;
+        }
+        if (backInvokedCallback == null) {
+            return;
+        }
+        try {
+            getOnBackInvokedDispatcher().unregisterOnBackInvokedCallback(backInvokedCallback);
+        } catch (Throwable ignored) {
+        } finally {
+            backInvokedCallback = null;
+        }
+    }
+
     @Override
     protected void onDestroy() {
+        unregisterBackNavigationCallback();
         if (webView != null) {
             webView.destroy();
         }

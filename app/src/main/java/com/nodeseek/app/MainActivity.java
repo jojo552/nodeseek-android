@@ -16,6 +16,8 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.window.OnBackInvokedCallback;
+import android.window.OnBackInvokedDispatcher;
 import android.webkit.CookieManager;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
@@ -69,6 +71,7 @@ public class MainActivity extends Activity {
     private boolean hasEnteredBackground;
     private boolean firstPageLoaded;
     private ValueCallback<Uri[]> pendingFilePathCallback;
+    private OnBackInvokedCallback backInvokedCallback;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +86,7 @@ public class MainActivity extends Activity {
         configureEdgeToEdgeInsets();
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         applyStatusBarScrimColor(getDefaultStatusBarColor());
+        registerBackNavigationCallback();
         if (!restoreWebViewState(savedInstanceState)) {
             webContent.loadUrl(resolveLaunchUrl(getIntent()));
         }
@@ -820,16 +824,64 @@ public class MainActivity extends Activity {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
+    public void onBackPressed() {
+        handleBackNavigation();
+    }
+
+    @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK && webContent.canGoBack()) {
-            webContent.goBack();
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            handleBackNavigation();
             return true;
         }
         return super.onKeyDown(keyCode, event);
     }
 
+    private void handleBackNavigation() {
+        if (webContent != null && webContent.canGoBack()) {
+            webContent.goBack();
+            return;
+        }
+        finish();
+    }
+
+    private void registerBackNavigationCallback() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            return;
+        }
+        if (backInvokedCallback != null) {
+            return;
+        }
+        backInvokedCallback = this::handleBackNavigation;
+        try {
+            getOnBackInvokedDispatcher().registerOnBackInvokedCallback(
+                OnBackInvokedDispatcher.PRIORITY_DEFAULT,
+                backInvokedCallback
+            );
+        } catch (Throwable ignored) {
+            backInvokedCallback = null;
+        }
+    }
+
+    private void unregisterBackNavigationCallback() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            return;
+        }
+        if (backInvokedCallback == null) {
+            return;
+        }
+        try {
+            getOnBackInvokedDispatcher().unregisterOnBackInvokedCallback(backInvokedCallback);
+        } catch (Throwable ignored) {
+        } finally {
+            backInvokedCallback = null;
+        }
+    }
+
     @Override
     protected void onDestroy() {
+        unregisterBackNavigationCallback();
         mainHandler.removeCallbacks(webThemeSyncRunnable);
         mainHandler.removeCallbacks(statusBarSyncRunnable);
         mainHandler.removeCallbacks(refreshTimeoutRunnable);
