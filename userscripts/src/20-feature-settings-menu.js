@@ -1974,6 +1974,8 @@ body.dark-layout .nsx-sheet-item[data-a="filter"] .nsx-sheet-item-icon,html.dark
 		                const seen = new Set();
 		                const push = (el, type) => {
 		                    if (!el || el.nodeType !== 1) return;
+		                    // 角标检测仅针对“楼层容器外部”的原始角标，避免把融合后的楼层链接本体误判为角标
+		                    if (el.closest?.(".floor-link-wrapper")) return;
 		                    if (seen.has(el)) return;
 		                    if (type !== "hot" && type !== "pin") return;
 		                    seen.add(el);
@@ -2132,6 +2134,8 @@ body.dark-layout .nsx-sheet-item[data-a="filter"] .nsx-sheet-item-icon,html.dark
 		                try { link.classList.add("nsx-floor-fused", stateCls); } catch { }
 		                (badges || []).forEach(({ el }) => {
 		                    if (!el || el.nodeType !== 1) return;
+		                    // 保护：绝不隐藏楼层链接本体及其子节点
+		                    if (el === link || link.contains?.(el)) return;
 		                    // 融合模式下隐藏原角标节点，避免额外占位
 		                    try {
 		                        if (el.dataset?.nsxCornerHiddenByFused !== "1") {
