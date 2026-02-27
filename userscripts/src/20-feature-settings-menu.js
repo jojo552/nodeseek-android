@@ -2111,23 +2111,13 @@ body.dark-layout .nsx-sheet-item[data-a="filter"] .nsx-sheet-item-icon,html.dark
 		            };
 		            const syncFloorLinkHashByTightState = (host, link) => {
 		                if (!link || link.nodeType !== 1) return;
-		                let tight = false;
-		                try {
-		                    const wrap = link.closest?.(".floor-link-wrapper");
-		                    tight = !!(
-		                        host?.classList?.contains?.("nsx-floor-tight")
-		                        || host?.classList?.contains?.("nsx-floor-tight-2")
-		                        || wrap?.classList?.contains?.("nsx-floor-tight")
-		                        || wrap?.classList?.contains?.("nsx-floor-tight-2")
-		                    );
-		                } catch { }
 		                const txt = String(link.textContent || "").trim();
 		                if (!link.dataset?.nsxFloorRawText && txt) {
 		                    try { link.dataset.nsxFloorRawText = txt; } catch { }
 		                }
 		                const raw = String(link.dataset?.nsxFloorRawText || txt || "").trim();
 		                if (!raw) return;
-		                const nextText = tight ? raw.replace(/^#\s*/, "") : raw;
+		                const nextText = raw;
 		                if (String(link.textContent || "").trim() !== nextText) link.textContent = nextText;
 		            };
 
