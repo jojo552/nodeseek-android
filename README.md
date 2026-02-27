@@ -76,7 +76,10 @@ keyPassword=******
 
 ## CI 自动构建与发布
 
-GitHub Actions 会在 `main` 分支推送或手动触发时构建 APK，并发布到 `Releases/latest`。
+GitHub Actions 会在 `main` 分支推送或手动触发时自动构建 APK。
+
+- 未配置签名 secrets：构建 `debug` APK，并上传到当前工作流 `Artifacts`。
+- 已配置签名 secrets：构建 `release` APK，并在 `main` 分支发布到 `Releases/latest`。
 
 如需 CI 使用固定签名，请在仓库 `Secrets` 配置：
 

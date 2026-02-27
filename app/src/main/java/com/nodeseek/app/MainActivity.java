@@ -35,6 +35,7 @@ import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -778,10 +779,11 @@ public class MainActivity extends Activity {
             chooserIntent = new Intent(Intent.ACTION_GET_CONTENT);
         }
 
-        chooserIntent.addCategory(Intent.CATEGORY_OPENABLE);
-        chooserIntent.setType(resolveMimeType(fileChooserParams));
+        boolean allowMultiple = shouldAllowMultipleSelection(fileChooserParams);
+        configureFileChooserIntent(chooserIntent, fileChooserParams, allowMultiple);
         try {
-            startActivityForResult(Intent.createChooser(chooserIntent, "选择文件"), REQUEST_CODE_FILE_CHOOSER);
+            String title = allowMultiple ? "选择文件（可多选）" : "选择文件";
+            startActivityForResult(Intent.createChooser(chooserIntent, title), REQUEST_CODE_FILE_CHOOSER);
         } catch (Exception ignored) {
             if (pendingFilePathCallback != null) {
                 pendingFilePathCallback.onReceiveValue(null);
@@ -790,31 +792,123 @@ public class MainActivity extends Activity {
         }
     }
 
+    private boolean shouldAllowMultipleSelection(WebChromeClient.FileChooserParams fileChooserParams) {
+        return fileChooserParams != null
+            && fileChooserParams.getMode() == WebChromeClient.FileChooserParams.MODE_OPEN_MULTIPLE;
+    }
+
+    private void configureFileChooserIntent(
+        Intent chooserIntent,
+        WebChromeClient.FileChooserParams fileChooserParams,
+        boolean allowMultiple
+    ) {
+        if (chooserIntent == null) {
+            return;
+        }
+        String action = chooserIntent.getAction();
+        if (Intent.ACTION_CHOOSER.equals(action)) {
+            Intent targetIntent = chooserIntent.getParcelableExtra(Intent.EXTRA_INTENT);
+            if (targetIntent != null) {
+                configureFileIntentTarget(targetIntent, fileChooserParams, allowMultiple);
+                chooserIntent.putExtra(Intent.EXTRA_INTENT, targetIntent);
+            }
+            chooserIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, allowMultiple);
+            chooserIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            return;
+        }
+        configureFileIntentTarget(chooserIntent, fileChooserParams, allowMultiple);
+    }
+
+    private void configureFileIntentTarget(
+        Intent intent,
+        WebChromeClient.FileChooserParams fileChooserParams,
+        boolean allowMultiple
+    ) {
+        if (intent == null) {
+            return;
+        }
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType(resolveMimeType(fileChooserParams));
+        String[] mimeTypes = resolveMimeTypes(fileChooserParams);
+        if (mimeTypes.length > 0) {
+            intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
+        }
+        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, allowMultiple);
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+    }
+
     private String resolveMimeType(WebChromeClient.FileChooserParams fileChooserParams) {
+        String[] mimeTypes = resolveMimeTypes(fileChooserParams);
+        if (mimeTypes.length == 1) {
+            return mimeTypes[0];
+        }
+        return "*/*";
+    }
+
+    private String[] resolveMimeTypes(WebChromeClient.FileChooserParams fileChooserParams) {
         if (fileChooserParams == null) {
-            return "*/*";
+            return new String[0];
         }
         String[] acceptTypes = fileChooserParams.getAcceptTypes();
         if (acceptTypes == null || acceptTypes.length == 0) {
-            return "*/*";
+            return new String[0];
         }
+        LinkedHashSet<String> mimeTypes = new LinkedHashSet<>();
         for (String acceptType : acceptTypes) {
             if (acceptType == null) {
                 continue;
             }
-            String candidate = acceptType.trim();
-            if (!candidate.isEmpty()) {
-                return candidate;
+            String[] segments = acceptType.split(",");
+            for (String segment : segments) {
+                if (segment == null) {
+                    continue;
+                }
+                String candidate = segment.trim();
+                if (candidate.isEmpty() || "*/*".equals(candidate)) {
+                    continue;
+                }
+                mimeTypes.add(candidate);
             }
         }
-        return "*/*";
+        return mimeTypes.toArray(new String[0]);
+    }
+
+    private Uri[] parseFileChooserResultCompat(int resultCode, Intent data) {
+        if (resultCode != RESULT_OK || data == null) {
+            return null;
+        }
+        LinkedHashSet<Uri> uris = new LinkedHashSet<>();
+        Uri single = data.getData();
+        if (single != null) {
+            uris.add(single);
+        }
+        ClipData clipData = data.getClipData();
+        if (clipData != null) {
+            for (int i = 0; i < clipData.getItemCount(); i++) {
+                ClipData.Item item = clipData.getItemAt(i);
+                if (item == null) {
+                    continue;
+                }
+                Uri uri = item.getUri();
+                if (uri != null) {
+                    uris.add(uri);
+                }
+            }
+        }
+        if (uris.isEmpty()) {
+            return null;
+        }
+        return uris.toArray(new Uri[0]);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_CODE_FILE_CHOOSER) {
             if (pendingFilePathCallback != null) {
-                Uri[] result = WebChromeClient.FileChooserParams.parseResult(resultCode, data);
+                Uri[] result = parseFileChooserResultCompat(resultCode, data);
+                if (result == null || result.length == 0) {
+                    result = WebChromeClient.FileChooserParams.parseResult(resultCode, data);
+                }
                 pendingFilePathCallback.onReceiveValue(result);
                 pendingFilePathCallback = null;
             }

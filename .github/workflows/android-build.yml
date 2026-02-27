@@ -24,10 +24,29 @@ jobs:
           java-version: "17"
           cache: gradle
 
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
       - name: Grant gradlew execute permission
         run: chmod +x gradlew
 
+      - name: Check signing secrets
+        id: signing
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          if [ -n "$ANDROID_KEYSTORE_BASE64" ] && [ -n "$ANDROID_KEYSTORE_PASSWORD" ] && [ -n "$ANDROID_KEY_ALIAS" ] && [ -n "$ANDROID_KEY_PASSWORD" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::Signing secrets are missing. This run will build debug APK only."
+          fi
+
       - name: Prepare release signing
+        if: steps.signing.outputs.enabled == 'true'
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
@@ -35,8 +54,7 @@ jobs:
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
           if [ -z "$ANDROID_KEYSTORE_BASE64" ] || [ -z "$ANDROID_KEYSTORE_PASSWORD" ] || [ -z "$ANDROID_KEY_ALIAS" ] || [ -z "$ANDROID_KEY_PASSWORD" ]; then
-            echo "Missing signing secrets."
-            echo "Please set: ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS, ANDROID_KEY_PASSWORD"
+            echo "Signing secrets check failed unexpectedly."
             exit 1
           fi
 
@@ -49,36 +67,55 @@ jobs:
           keyPassword=$ANDROID_KEY_PASSWORD
           EOF
 
-      - name: Build release APK
-        run: ./gradlew --no-daemon assembleRelease
-
-      - name: Rename release APK
+      - name: Build APK
+        id: build
         run: |
-          APK_SRC="app/build/outputs/apk/release/app-release.apk"
-          APK_DST="app/build/outputs/apk/release/nodeseek.apk"
+          if [ "${{ steps.signing.outputs.enabled }}" = "true" ]; then
+            ./gradlew --no-daemon assembleRelease
+            VARIANT="release"
+            APK_SRC="app/build/outputs/apk/release/app-release.apk"
+            APK_NAME="nodeseek.apk"
+          else
+            ./gradlew --no-daemon assembleDebug
+            VARIANT="debug"
+            APK_SRC="app/build/outputs/apk/debug/app-debug.apk"
+            APK_NAME="nodeseek-debug.apk"
+          fi
+
           if [ ! -f "$APK_SRC" ]; then
             echo "APK not found: $APK_SRC"
             exit 1
           fi
+
+          APK_DST="app/build/outputs/apk/$APK_NAME"
           cp -f "$APK_SRC" "$APK_DST"
+          echo "variant=$VARIANT" >> "$GITHUB_OUTPUT"
+          echo "apk_path=$APK_DST" >> "$GITHUB_OUTPUT"
+          echo "apk_name=$APK_NAME" >> "$GITHUB_OUTPUT"
+
+      - name: Build summary
+        run: |
+          echo "Variant: ${{ steps.build.outputs.variant }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "APK: ${{ steps.build.outputs.apk_name }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Path: \`${{ steps.build.outputs.apk_path }}\`" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         continue-on-error: true
         with:
-          name: nodeseek-apk
-          path: app/build/outputs/apk/release/nodeseek.apk
+          name: nodeseek-apk-${{ steps.build.outputs.variant }}
+          path: ${{ steps.build.outputs.apk_path }}
           if-no-files-found: error
           retention-days: 1
 
       - name: Publish direct APK download
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main' && steps.build.outputs.variant == 'release'
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
           GH_NO_UPDATE_NOTIFIER: "1"
         run: |
-          APK_PATH="app/build/outputs/apk/release/nodeseek.apk"
+          APK_PATH="${{ steps.build.outputs.apk_path }}"
           if [ ! -f "$APK_PATH" ]; then
             echo "APK not found: $APK_PATH"
             exit 1

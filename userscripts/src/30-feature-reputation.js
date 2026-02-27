@@ -136,8 +136,8 @@
 		body.dark-layout .nsx-user-sheet-actions .nsx-user-sheet-btn.block,html.dark .nsx-user-sheet-actions .nsx-user-sheet-btn.block{border-color:rgba(248,113,113,.44);background:linear-gradient(180deg,rgba(159,18,57,.34),rgba(136,19,55,.24));color:#fda4af}
 		.nsx-user-sheet-btn:hover{transform:translateY(-1px)}
 		.nsx-user-sheet-btn:active{transform:scale(.985);opacity:.96}
-		/* 身份标签（楼主/博主/频道主/OneMan/管理/Dev）：统一胶囊体系，小尺寸不抢主视觉 */
-		.nsx-op-badge,.nsx-blogger-badge,.nsx-owner-badge,.nsx-oneman-badge,.nsx-admin-badge,.nsx-dev-badge{position:relative;display:inline-flex!important;align-items:center!important;justify-content:center!important;flex:0 0 auto!important;height:14px!important;line-height:14px!important;padding:0 5px 0 7px!important;margin-left:5px!important;border-radius:999px!important;box-shadow:0 1px 3px rgba(0,0,0,.1)!important;font-size:9.5px!important;font-weight:760!important;letter-spacing:.1px!important;overflow:hidden}
+		/* 身份标签（楼主/博主/频道主/OneMan/管理/Dev/交易中介）：统一胶囊体系，小尺寸不抢主视觉 */
+		.nsx-op-badge,.nsx-blogger-badge,.nsx-owner-badge,.nsx-oneman-badge,.nsx-admin-badge,.nsx-dev-badge,.nsx-broker-badge{position:relative;display:inline-flex!important;align-items:center!important;justify-content:center!important;flex:0 0 auto!important;height:14px!important;line-height:14px!important;padding:0 5px 0 7px!important;margin-left:5px!important;border-radius:999px!important;box-shadow:0 1px 3px rgba(0,0,0,.1)!important;font-size:9.5px!important;font-weight:760!important;letter-spacing:.1px!important;overflow:hidden}
 		.nsx-op-badge{border:1px solid rgba(124,58,237,.32)!important;background:linear-gradient(180deg,rgba(245,243,255,.98),rgba(237,233,254,.86))!important;color:#6d28d9!important}
 		.nsx-op-badge::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;background:linear-gradient(180deg,#a855f7 0%,#7c3aed 55%,#6d28d9 100%);opacity:.98}
 		body.dark-layout .nsx-op-badge,html.dark .nsx-op-badge{border-color:rgba(167,139,250,.36)!important;background:linear-gradient(180deg,rgba(56,34,95,.98),rgba(38,24,68,.9))!important;box-shadow:0 1px 4px rgba(0,0,0,.32)!important;color:#ddd6fe!important}
@@ -158,6 +158,9 @@
 		.nsx-dev-badge{border:1px solid rgba(8,145,178,.32)!important;background:linear-gradient(180deg,rgba(236,254,255,.98),rgba(207,250,254,.86))!important;color:#0e7490!important}
 		.nsx-dev-badge::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;background:linear-gradient(180deg,#22d3ee 0%,#06b6d4 55%,#0e7490 100%);opacity:.98}
 		body.dark-layout .nsx-dev-badge,html.dark .nsx-dev-badge{border-color:rgba(34,211,238,.42)!important;background:linear-gradient(180deg,rgba(8,47,73,.92),rgba(12,74,110,.82))!important;box-shadow:0 1px 4px rgba(0,0,0,.32)!important;color:#a5f3fc!important}
+		.nsx-broker-badge{border:1px solid rgba(217,119,6,.34)!important;background:linear-gradient(180deg,rgba(255,251,235,.98),rgba(254,243,199,.86))!important;color:#b45309!important}
+		.nsx-broker-badge::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;background:linear-gradient(180deg,#fbbf24 0%,#f59e0b 55%,#b45309 100%);opacity:.98}
+		body.dark-layout .nsx-broker-badge,html.dark .nsx-broker-badge{border-color:rgba(251,191,36,.42)!important;background:linear-gradient(180deg,rgba(120,53,15,.92),rgba(146,64,14,.82))!important;box-shadow:0 1px 4px rgba(0,0,0,.32)!important;color:#fde68a!important}
 		.nsx-mute-badge{display:inline-flex!important;align-items:center!important;justify-content:center!important;flex:0 0 auto!important;height:14px!important;line-height:14px!important;padding:0 5px!important;margin-left:5px!important;border-radius:999px!important;border:1px solid #ffc1bb!important;background:#fff2f1!important;box-shadow:none!important;font-size:9.5px!important;font-weight:760!important;letter-spacing:0!important;color:#cf1322!important}
 		.nsx-mute-badge.nsx-mute-badge-secondary{height:13px!important;line-height:13px!important;padding:0 4px!important;margin:0 6px 0 0!important;font-size:9px!important;vertical-align:middle!important;opacity:.95}
 		.nsk-content-meta-info time + .nsx-mute-badge.nsx-mute-badge-secondary{margin-left:6px!important}
@@ -179,8 +182,8 @@
 		.nsx-user-id-meta .nsx-user-id-reg{font-size:.84em;line-height:1;opacity:.92;font-weight:680;white-space:nowrap;color:var(--nsx-user-reg-color,#475569)}
 		body.dark-layout .nsx-user-id-meta .nsx-user-id-reg,html.dark .nsx-user-id-meta .nsx-user-id-reg{color:var(--nsx-user-reg-color-dark,#d4d4d8)}
 		/* 作者行拥挤时：不换行下沉，改为单行逐级紧凑与自动缩写 */
-		.nsk-content-meta-info .author-info.nsx-role-abbrev-1 .nsx-op-badge,.nsk-content-meta-info .author-info.nsx-role-abbrev-1 .nsx-blogger-badge,.nsk-content-meta-info .author-info.nsx-role-abbrev-1 .nsx-owner-badge,.nsk-content-meta-info .author-info.nsx-role-abbrev-1 .nsx-oneman-badge,.nsk-content-meta-info .author-info.nsx-role-abbrev-1 .nsx-admin-badge,.nsk-content-meta-info .author-info.nsx-role-abbrev-1 .nsx-dev-badge{font-size:9px!important;padding:0 4px 0 6px!important;margin-left:3px!important}
-		.nsk-content-meta-info .author-info.nsx-role-abbrev-2 .nsx-op-badge,.nsk-content-meta-info .author-info.nsx-role-abbrev-2 .nsx-blogger-badge,.nsk-content-meta-info .author-info.nsx-role-abbrev-2 .nsx-owner-badge,.nsk-content-meta-info .author-info.nsx-role-abbrev-2 .nsx-oneman-badge,.nsk-content-meta-info .author-info.nsx-role-abbrev-2 .nsx-admin-badge,.nsk-content-meta-info .author-info.nsx-role-abbrev-2 .nsx-dev-badge{font-size:8.6px!important;padding:0 3px 0 5px!important;margin-left:2px!important;letter-spacing:0!important}
+		.nsk-content-meta-info .author-info.nsx-role-abbrev-1 .nsx-op-badge,.nsk-content-meta-info .author-info.nsx-role-abbrev-1 .nsx-blogger-badge,.nsk-content-meta-info .author-info.nsx-role-abbrev-1 .nsx-owner-badge,.nsk-content-meta-info .author-info.nsx-role-abbrev-1 .nsx-oneman-badge,.nsk-content-meta-info .author-info.nsx-role-abbrev-1 .nsx-admin-badge,.nsk-content-meta-info .author-info.nsx-role-abbrev-1 .nsx-dev-badge,.nsk-content-meta-info .author-info.nsx-role-abbrev-1 .nsx-broker-badge{font-size:9px!important;padding:0 4px 0 6px!important;margin-left:3px!important}
+		.nsk-content-meta-info .author-info.nsx-role-abbrev-2 .nsx-op-badge,.nsk-content-meta-info .author-info.nsx-role-abbrev-2 .nsx-blogger-badge,.nsk-content-meta-info .author-info.nsx-role-abbrev-2 .nsx-owner-badge,.nsk-content-meta-info .author-info.nsx-role-abbrev-2 .nsx-oneman-badge,.nsk-content-meta-info .author-info.nsx-role-abbrev-2 .nsx-admin-badge,.nsk-content-meta-info .author-info.nsx-role-abbrev-2 .nsx-dev-badge,.nsk-content-meta-info .author-info.nsx-role-abbrev-2 .nsx-broker-badge{font-size:8.6px!important;padding:0 3px 0 5px!important;margin-left:2px!important;letter-spacing:0!important}
 		.nsk-content-meta-info .author-info .nsx-badge-abbrev{cursor:pointer}
 		@media (max-width:768px){
 		.nsk-content-meta-info .author-info.nsx-author-nowrap{display:flex;align-items:center;justify-content:flex-start;flex-wrap:nowrap;max-width:100%;min-width:0;overflow:hidden}
@@ -196,11 +199,11 @@
 		.nsk-content-meta-info .author-info.nsx-author-tight .nsx-user-id-meta{max-width:min(40vw,180px)!important;margin-left:4px!important}
 		.nsk-content-meta-info .author-info.nsx-author-tight .nsx-user-id-sep{padding:0 2px!important}
 		.nsk-content-meta-info .author-info.nsx-author-tight .nsx-user-id-level{max-width:6.6em!important}
-		.nsk-content-meta-info .author-info.nsx-author-tight .nsx-op-badge,.nsk-content-meta-info .author-info.nsx-author-tight .nsx-blogger-badge,.nsk-content-meta-info .author-info.nsx-author-tight .nsx-owner-badge,.nsk-content-meta-info .author-info.nsx-author-tight .nsx-oneman-badge,.nsk-content-meta-info .author-info.nsx-author-tight .nsx-admin-badge,.nsk-content-meta-info .author-info.nsx-author-tight .nsx-dev-badge,.nsk-content-meta-info .author-info.nsx-author-tight .nsx-mute-badge{margin-left:3px!important}
-		.nsx-op-badge,.nsx-blogger-badge,.nsx-owner-badge,.nsx-admin-badge,.nsx-dev-badge{height:13px!important;line-height:13px!important;font-size:9px!important;padding:0 4px 0 6px!important}
+		.nsk-content-meta-info .author-info.nsx-author-tight .nsx-op-badge,.nsk-content-meta-info .author-info.nsx-author-tight .nsx-blogger-badge,.nsk-content-meta-info .author-info.nsx-author-tight .nsx-owner-badge,.nsk-content-meta-info .author-info.nsx-author-tight .nsx-oneman-badge,.nsk-content-meta-info .author-info.nsx-author-tight .nsx-admin-badge,.nsk-content-meta-info .author-info.nsx-author-tight .nsx-dev-badge,.nsk-content-meta-info .author-info.nsx-author-tight .nsx-broker-badge,.nsk-content-meta-info .author-info.nsx-author-tight .nsx-mute-badge{margin-left:3px!important}
+		.nsx-op-badge,.nsx-blogger-badge,.nsx-owner-badge,.nsx-admin-badge,.nsx-dev-badge,.nsx-broker-badge{height:13px!important;line-height:13px!important;font-size:9px!important;padding:0 4px 0 6px!important}
 		.nsx-oneman-badge{min-height:13px!important;height:auto!important;line-height:1.04!important;font-size:9px!important;padding:1px 4px 1px 6px!important}
 		.nsx-mute-badge{height:13px!important;line-height:13px!important;font-size:9px!important;padding:0 4px!important}
-		.nsk-content-meta-info .author-info.nsx-role-abbrev-2 .nsx-op-badge,.nsk-content-meta-info .author-info.nsx-role-abbrev-2 .nsx-blogger-badge,.nsk-content-meta-info .author-info.nsx-role-abbrev-2 .nsx-owner-badge,.nsk-content-meta-info .author-info.nsx-role-abbrev-2 .nsx-oneman-badge,.nsk-content-meta-info .author-info.nsx-role-abbrev-2 .nsx-admin-badge,.nsk-content-meta-info .author-info.nsx-role-abbrev-2 .nsx-dev-badge{font-size:8px!important;padding:0 3px 0 4px!important;margin-left:2px!important}
+		.nsk-content-meta-info .author-info.nsx-role-abbrev-2 .nsx-op-badge,.nsk-content-meta-info .author-info.nsx-role-abbrev-2 .nsx-blogger-badge,.nsk-content-meta-info .author-info.nsx-role-abbrev-2 .nsx-owner-badge,.nsk-content-meta-info .author-info.nsx-role-abbrev-2 .nsx-oneman-badge,.nsk-content-meta-info .author-info.nsx-role-abbrev-2 .nsx-admin-badge,.nsk-content-meta-info .author-info.nsx-role-abbrev-2 .nsx-dev-badge,.nsk-content-meta-info .author-info.nsx-role-abbrev-2 .nsx-broker-badge{font-size:8px!important;padding:0 3px 0 4px!important;margin-left:2px!important}
 		}
 		`);
 
@@ -443,7 +446,7 @@
 	                };
 
 	                // 优化作者行身份标识：
-	                // - 楼主/博主/频道主/OneMan/管理/Dev 统一为主题小胶囊
+	                // - 楼主/博主/频道主/OneMan/管理/Dev/交易中介 统一为主题小胶囊
 	                // - 临时禁言/禁言 统一为警示胶囊
 	                // - 若标签被布局到右侧（靠近楼层号），尝试移动到用户名后方
 	                const applyOpBadgeStyle = (authorLink) => {
@@ -485,10 +488,11 @@
 	                    let oneManTag = null;
 	                    let adminTag = null;
 	                    let devTag = null;
+	                    let brokerTag = null;
 	                    let muteTag = null;
 	                    for (const el of candidates) {
 	                        if (!el || el === authorLink) continue;
-	                        if (el.parentElement && /nsx-(op|blogger|owner|oneman|admin|dev|mute)-badge/.test(el.parentElement.className || "")) continue;
+	                        if (el.parentElement && /nsx-(op|blogger|owner|oneman|admin|dev|broker|mute)-badge/.test(el.parentElement.className || "")) continue;
 	                        const text = (el.textContent || "").trim();
 	                        const norm = text.replace(/\s+/g, "");
 	                        const lower = norm.toLowerCase();
@@ -547,6 +551,19 @@
 	                            try { el.classList.add("nsx-dev-badge"); } catch { }
 	                            continue;
 	                        }
+	                        if (
+	                            norm === "交易中介"
+	                            || norm === "中介"
+	                            || /交易中介/.test(norm)
+	                            || /中介/.test(norm)
+	                            || lower === "broker"
+	                            || lower === "tradebroker"
+	                        ) {
+	                            found = true;
+	                            if (!brokerTag) brokerTag = el;
+	                            try { el.classList.add("nsx-broker-badge"); } catch { }
+	                            continue;
+	                        }
 	                        if (norm === "临时禁言" || norm === "禁言" || /禁言/.test(norm)) {
 	                            found = true;
 	                            if (!muteTag) muteTag = el;
@@ -554,10 +571,10 @@
 	                        }
 	                    }
 	                    if (found) {
-	                        // 楼主/博主/频道主/OneMan/管理/Dev 保持在用户名后；禁言标签优先挪到“时间行”减少拥挤
+	                        // 楼主/博主/频道主/OneMan/管理/Dev/交易中介 保持在用户名后；禁言标签优先挪到“时间行”减少拥挤
 	                        let lastRoleAnchor = authorLink;
 	                        try {
-	                            [opTag, bloggerTag, ownerTag, oneManTag, adminTag, devTag].forEach(tag => {
+	                            [opTag, bloggerTag, ownerTag, brokerTag, oneManTag, adminTag, devTag].forEach(tag => {
 	                                if (!tag || tag === lastRoleAnchor.nextSibling) return;
 	                                lastRoleAnchor.insertAdjacentElement?.("afterend", tag);
 	                                lastRoleAnchor = tag;
@@ -586,8 +603,8 @@
 	                    }
 	                    return found;
 	                };
-	                const ROLE_BADGE_SELECTOR = ".nsx-op-badge,.nsx-blogger-badge,.nsx-owner-badge,.nsx-oneman-badge,.nsx-admin-badge,.nsx-dev-badge";
-	                const ROLE_BADGE_PRIORITY = ["nsx-oneman-badge", "nsx-dev-badge", "nsx-admin-badge", "nsx-owner-badge", "nsx-blogger-badge", "nsx-op-badge"];
+	                const ROLE_BADGE_SELECTOR = ".nsx-op-badge,.nsx-blogger-badge,.nsx-owner-badge,.nsx-oneman-badge,.nsx-admin-badge,.nsx-dev-badge,.nsx-broker-badge";
+	                const ROLE_BADGE_PRIORITY = ["nsx-oneman-badge", "nsx-broker-badge", "nsx-dev-badge", "nsx-admin-badge", "nsx-owner-badge", "nsx-blogger-badge", "nsx-op-badge"];
 	                const ROLE_BADGE_REVEAL_MS = 1800;
 	                const getRoleOverflowRow = (authorInfo) => {
 	                    const parent = authorInfo?.parentElement;
@@ -743,6 +760,10 @@
 	                    }
 	                    if (tag.classList?.contains?.("nsx-dev-badge") || /dev|开发/.test(lower) || /开发/.test(raw)) {
 	                        if (level >= 2) return "DV";
+	                        return raw;
+	                    }
+	                    if (tag.classList?.contains?.("nsx-broker-badge") || /交易中介|中介/.test(raw) || /tradebroker|broker/.test(lower)) {
+	                        if (level >= 2) return "中介";
 	                        return raw;
 	                    }
 	                    const latin = toAsciiAcronym(raw, 2);
@@ -1037,7 +1058,7 @@
 		                                    const ar = authorInfo.getBoundingClientRect?.();
 		                                    if (ar && ar.width > 0 && ar.height > 0) {
 		                                        const watch = new Set();
-		                                        try { authorInfo.querySelectorAll?.(".nsx-user-id-meta,.nsx-lv-badge,.nsx-user-mini-meta,.nsx-op-badge,.nsx-blogger-badge,.nsx-owner-badge,.nsx-oneman-badge,.nsx-admin-badge,.nsx-dev-badge")?.forEach?.(n => watch.add(n)); } catch { }
+		                                        try { authorInfo.querySelectorAll?.(".nsx-user-id-meta,.nsx-lv-badge,.nsx-user-mini-meta,.nsx-op-badge,.nsx-blogger-badge,.nsx-owner-badge,.nsx-oneman-badge,.nsx-admin-badge,.nsx-dev-badge,.nsx-broker-badge")?.forEach?.(n => watch.add(n)); } catch { }
 		                                        for (const node of watch) {
 		                                            if (!node) continue;
 		                                            const rr = node.getBoundingClientRect?.();
