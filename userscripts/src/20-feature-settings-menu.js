@@ -1855,8 +1855,23 @@ body.dark-layout .nsx-sheet-item[data-a="filter"] .nsx-sheet-item-icon,html.dark
 			                .dark-layout svg.nsx-pin-badge use,html.dark svg.nsx-pin-badge use{fill:currentColor!important;stroke:currentColor!important}
 			                .nsk-content-meta-info .floor-link-wrapper{
 			                    display:inline-flex!important;
+			                    flex-direction:column!important;
+			                    align-items:flex-end!important;
+			                    justify-content:flex-start!important;
+			                    gap:2px!important;
+			                    min-width:max-content!important
+			                }
+			                .nsk-content-meta-info .floor-link-wrapper > a[href^="#"],.nsk-content-meta-info .floor-link-wrapper > a.floor-link{
+			                    display:inline-flex!important;
 			                    align-items:center!important;
-			                    gap:3px!important
+			                    justify-content:flex-end!important
+			                }
+			                .nsk-content-meta-info .floor-link-wrapper .nsx-floor-badge-dock{
+			                    display:inline-flex!important;
+			                    flex-direction:column!important;
+			                    align-items:flex-end!important;
+			                    gap:2px!important;
+			                    width:auto!important
 			                }
 			                @media (max-width:768px){
 			                    .nsx-corner-badge{
@@ -1877,7 +1892,8 @@ body.dark-layout .nsx-sheet-item[data-a="filter"] .nsx-sheet-item-icon,html.dark
 			                        min-width:clamp(15px,4.4vw,16px)!important;
 			                        padding:0 2px!important
 			                    }
-			                    .nsk-content-meta-info .floor-link-wrapper{gap:2px!important}
+			                    .nsk-content-meta-info .floor-link-wrapper{gap:1px!important}
+			                    .nsk-content-meta-info .floor-link-wrapper .nsx-floor-badge-dock{gap:1px!important}
 			                }
 			            `);
 
@@ -1980,30 +1996,57 @@ body.dark-layout .nsx-sheet-item[data-a="filter"] .nsx-sheet-item-icon,html.dark
 		                    });
 		                } catch { }
 
-		                return badges;
+			                return badges;
+			            };
+
+		            const clearCornerBadgeSafePadding = (host) => {
+		                if (!host || host.nodeType !== 1) return;
+		                if (host.dataset?.nsxCornerPadR0 !== undefined) {
+		                    try { host.style.paddingRight = host.dataset.nsxCornerPadR0 || ""; } catch { }
+		                    try { delete host.dataset.nsxCornerPadR0; } catch { }
+		                }
+		                try { host.classList.remove("nsx-has-corner-badge"); } catch { }
+		                try {
+		                    host.querySelectorAll?.(".nsx-floor-badge-dock")?.forEach?.((dock) => {
+		                        if (!dock || dock.nodeType !== 1) return;
+		                        if ((dock.children?.length || 0) > 0) return;
+		                        dock.remove?.();
+		                    });
+		                } catch { }
+		            };
+
+		            const getFloorBadgeDockInHost = (host) => {
+		                if (!host || host.nodeType !== 1) return null;
+		                const floorWrap = host.querySelector?.(".floor-link-wrapper");
+		                if (!floorWrap || floorWrap.nodeType !== 1) return null;
+		                let dock = floorWrap.querySelector?.(".nsx-floor-badge-dock");
+		                if (!dock) {
+		                    dock = document.createElement("div");
+		                    dock.className = "nsx-floor-badge-dock";
+		                    floorWrap.appendChild(dock);
+		                }
+		                return dock;
+		            };
+
+		            const dockCornerBadgesUnderFloor = (host, badges) => {
+		                if (!host || host.nodeType !== 1) return false;
+		                const dock = getFloorBadgeDockInHost(host);
+		                if (!dock) return false;
+		                (badges || []).forEach(({ el }) => {
+		                    if (!el || el.nodeType !== 1) return;
+		                    try {
+		                        if (el.parentElement !== dock) dock.appendChild(el);
+		                    } catch { }
+		                });
+		                return true;
 		            };
 
 		            const applyCornerBadgeSafePadding = (host) => {
 		                if (!host || host.nodeType !== 1) return;
 
-		                const narrow = isSmallScreen(768);
-		                if (!narrow) {
-		                    // 宽屏：恢复原始 padding-right，避免影响桌面布局
-		                    if (host.dataset?.nsxCornerPadR0 !== undefined) {
-		                        try { host.style.paddingRight = host.dataset.nsxCornerPadR0 || ""; } catch { }
-		                        try { delete host.dataset.nsxCornerPadR0; } catch { }
-		                    }
-		                    try { host.classList.remove("nsx-has-corner-badge"); } catch { }
-		                    return;
-		                }
-
 		                const found = detectCornerBadgesInHost(host);
 		                if (!found.length) {
-		                    if (host.dataset?.nsxCornerPadR0 !== undefined) {
-		                        try { host.style.paddingRight = host.dataset.nsxCornerPadR0 || ""; } catch { }
-		                        try { delete host.dataset.nsxCornerPadR0; } catch { }
-		                    }
-		                    try { host.classList.remove("nsx-has-corner-badge"); } catch { }
+		                    clearCornerBadgeSafePadding(host);
 		                    return;
 		                }
 
@@ -2023,6 +2066,12 @@ body.dark-layout .nsx-sheet-item[data-a="filter"] .nsx-sheet-item-icon,html.dark
 		                    }
 		                    try { el.classList.add("nsx-corner-badge", type === "hot" ? "nsx-hot-badge" : "nsx-pin-badge"); } catch { }
 		                });
+
+		                // 目标行为：角标固定挂到楼层号下方（HOT / 图钉统一）
+		                if (dockCornerBadgesUnderFloor(host, found)) {
+		                    clearCornerBadgeSafePadding(host);
+		                    return;
+		                }
 
 		                // 计算右侧安全间距：取角标最大宽度 + 额外边距，避免遮挡作者行/统计信息
 		                const measureAndApply = () => {
