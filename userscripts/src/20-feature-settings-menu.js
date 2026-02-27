@@ -1939,10 +1939,6 @@ body.dark-layout .nsx-sheet-item[data-a="filter"] .nsx-sheet-item-icon,html.dark
 			                    background:linear-gradient(180deg,rgba(55,48,163,.34),rgba(76,29,149,.24))!important;
 			                    color:#ddd6fe!important
 			                }
-			                .nsk-content-meta-info[data-nsx-floor-fused="1"] .floor-link-wrapper [data-nsx-corner-hidden-by-fused="1"]{
-			                    display:none!important;
-			                    visibility:hidden!important
-			                }
 			                @media (max-width:768px){
 			                    .nsx-corner-badge{
 			                        min-height:13px!important;
@@ -2094,7 +2090,6 @@ body.dark-layout .nsx-sheet-item[data-a="filter"] .nsx-sheet-item-icon,html.dark
 		                        if (!el || el.nodeType !== 1) return;
 		                        try {
 		                            el.style.display = el.dataset?.nsxCornerDisplay0 || "";
-		                            try { el.classList.remove("nsx-corner-badge", "nsx-hot-badge", "nsx-pin-badge"); } catch { }
 		                            delete el.dataset.nsxCornerDisplay0;
 		                            delete el.dataset.nsxCornerHiddenByFused;
 		                        } catch { }
@@ -2108,7 +2103,6 @@ body.dark-layout .nsx-sheet-item[data-a="filter"] .nsx-sheet-item-icon,html.dark
 		                if (link) {
 		                    try { link.classList.remove(...FUSED_FLOOR_CLASSES); } catch { }
 		                }
-		                try { delete host.dataset.nsxFloorFused; } catch { }
 		                restoreHiddenCornerBadgesInHost(host);
 		            };
 
@@ -2129,7 +2123,6 @@ body.dark-layout .nsx-sheet-item[data-a="filter"] .nsx-sheet-item-icon,html.dark
 
 		                clearFloorCornerFusionState(host);
 		                try { link.classList.add("nsx-floor-fused", stateCls); } catch { }
-		                try { host.dataset.nsxFloorFused = "1"; } catch { }
 		                (badges || []).forEach(({ el }) => {
 		                    if (!el || el.nodeType !== 1) return;
 		                    // 融合模式下隐藏原角标节点，避免额外占位
@@ -2178,6 +2171,7 @@ body.dark-layout .nsx-sheet-item[data-a="filter"] .nsx-sheet-item-icon,html.dark
 		                    } else {
 		                        try { delete el.dataset.nsxCornerLabel; } catch { }
 		                    }
+		                    try { el.classList.add("nsx-corner-badge", type === "hot" ? "nsx-hot-badge" : "nsx-pin-badge"); } catch { }
 		                });
 
 		                // 目标行为：融合到楼层号本体（不额外占位）
@@ -2185,12 +2179,6 @@ body.dark-layout .nsx-sheet-item[data-a="filter"] .nsx-sheet-item-icon,html.dark
 		                    clearCornerBadgeSafePadding(host);
 		                    return;
 		                }
-
-		                // 兜底：无法融合时沿用原角标胶囊样式
-		                found.forEach(({ el, type }) => {
-		                    if (!el || el.nodeType !== 1) return;
-		                    try { el.classList.add("nsx-corner-badge", type === "hot" ? "nsx-hot-badge" : "nsx-pin-badge"); } catch { }
-		                });
 
 		                // 计算右侧安全间距：取角标最大宽度 + 额外边距，避免遮挡作者行/统计信息
 		                const measureAndApply = () => {
