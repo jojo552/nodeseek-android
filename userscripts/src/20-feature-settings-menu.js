@@ -1855,23 +1855,89 @@ body.dark-layout .nsx-sheet-item[data-a="filter"] .nsx-sheet-item-icon,html.dark
 			                .dark-layout svg.nsx-pin-badge use,html.dark svg.nsx-pin-badge use{fill:currentColor!important;stroke:currentColor!important}
 			                .nsk-content-meta-info .floor-link-wrapper{
 			                    display:inline-flex!important;
-			                    flex-direction:column!important;
-			                    align-items:flex-end!important;
-			                    justify-content:flex-start!important;
+			                    align-items:center!important;
+			                    justify-content:flex-end!important;
 			                    gap:2px!important;
 			                    min-width:max-content!important
 			                }
 			                .nsk-content-meta-info .floor-link-wrapper > a[href^="#"],.nsk-content-meta-info .floor-link-wrapper > a.floor-link{
+			                    position:relative!important;
 			                    display:inline-flex!important;
 			                    align-items:center!important;
-			                    justify-content:flex-end!important
+			                    justify-content:center!important;
+			                    line-height:1!important;
+			                    overflow:visible!important
 			                }
-			                .nsk-content-meta-info .floor-link-wrapper .nsx-floor-badge-dock{
-			                    display:inline-flex!important;
-			                    flex-direction:column!important;
-			                    align-items:flex-end!important;
-			                    gap:2px!important;
-			                    width:auto!important
+			                .nsk-content-meta-info .floor-link-wrapper > a.nsx-floor-fused{
+			                    padding:1px 4px!important;
+			                    border-radius:999px!important;
+			                    border:1px solid rgba(148,163,184,.28)!important;
+			                    background:linear-gradient(180deg,rgba(248,250,252,.96),rgba(241,245,249,.88))!important;
+			                    color:#334155!important;
+			                    box-shadow:0 1px 3px rgba(15,23,42,.12)!important
+			                }
+			                .nsk-content-meta-info .floor-link-wrapper > a.nsx-floor-fused::before,.nsk-content-meta-info .floor-link-wrapper > a.nsx-floor-fused::after{
+			                    position:absolute;
+			                    z-index:2;
+			                    font-size:9px;
+			                    line-height:1;
+			                    pointer-events:none;
+			                    text-shadow:0 1px 2px rgba(15,23,42,.26)
+			                }
+			                .nsk-content-meta-info .floor-link-wrapper > a.nsx-floor-fused-hot{
+			                    border-color:rgba(251,146,60,.4)!important;
+			                    background:linear-gradient(180deg,rgba(255,247,237,.98),rgba(255,237,213,.9))!important;
+			                    color:#c2410c!important
+			                }
+			                .nsk-content-meta-info .floor-link-wrapper > a.nsx-floor-fused-hot::after{
+			                    content:"🔥";
+			                    right:-7px;
+			                    top:-7px
+			                }
+			                .nsk-content-meta-info .floor-link-wrapper > a.nsx-floor-fused-pin{
+			                    border-color:rgba(96,165,250,.42)!important;
+			                    background:linear-gradient(180deg,rgba(239,246,255,.98),rgba(219,234,254,.88))!important;
+			                    color:#1d4ed8!important
+			                }
+			                .nsk-content-meta-info .floor-link-wrapper > a.nsx-floor-fused-pin::after{
+			                    content:"📌";
+			                    right:-7px;
+			                    top:-7px
+			                }
+			                .nsk-content-meta-info .floor-link-wrapper > a.nsx-floor-fused-both{
+			                    border-color:rgba(167,139,250,.45)!important;
+			                    background:linear-gradient(180deg,rgba(245,243,255,.98),rgba(237,233,254,.88))!important;
+			                    color:#6d28d9!important
+			                }
+			                .nsk-content-meta-info .floor-link-wrapper > a.nsx-floor-fused-both::before{
+			                    content:"📌";
+			                    right:-8px;
+			                    top:4px
+			                }
+			                .nsk-content-meta-info .floor-link-wrapper > a.nsx-floor-fused-both::after{
+			                    content:"🔥";
+			                    right:-8px;
+			                    top:-8px
+			                }
+			                .dark-layout .nsk-content-meta-info .floor-link-wrapper > a.nsx-floor-fused,html.dark .nsk-content-meta-info .floor-link-wrapper > a.nsx-floor-fused{
+			                    border-color:rgba(148,163,184,.34)!important;
+			                    background:linear-gradient(180deg,rgba(30,41,59,.92),rgba(15,23,42,.86))!important;
+			                    color:#cbd5e1!important
+			                }
+			                .dark-layout .nsk-content-meta-info .floor-link-wrapper > a.nsx-floor-fused-hot,html.dark .nsk-content-meta-info .floor-link-wrapper > a.nsx-floor-fused-hot{
+			                    border-color:rgba(251,146,60,.48)!important;
+			                    background:linear-gradient(180deg,rgba(67,35,20,.94),rgba(58,31,19,.86))!important;
+			                    color:#fdba74!important
+			                }
+			                .dark-layout .nsk-content-meta-info .floor-link-wrapper > a.nsx-floor-fused-pin,html.dark .nsk-content-meta-info .floor-link-wrapper > a.nsx-floor-fused-pin{
+			                    border-color:rgba(96,165,250,.5)!important;
+			                    background:linear-gradient(180deg,rgba(30,64,175,.34),rgba(30,58,138,.24))!important;
+			                    color:#bfdbfe!important
+			                }
+			                .dark-layout .nsk-content-meta-info .floor-link-wrapper > a.nsx-floor-fused-both,html.dark .nsk-content-meta-info .floor-link-wrapper > a.nsx-floor-fused-both{
+			                    border-color:rgba(196,181,253,.5)!important;
+			                    background:linear-gradient(180deg,rgba(55,48,163,.34),rgba(76,29,149,.24))!important;
+			                    color:#ddd6fe!important
 			                }
 			                @media (max-width:768px){
 			                    .nsx-corner-badge{
@@ -1893,7 +1959,11 @@ body.dark-layout .nsx-sheet-item[data-a="filter"] .nsx-sheet-item-icon,html.dark
 			                        padding:0 2px!important
 			                    }
 			                    .nsk-content-meta-info .floor-link-wrapper{gap:1px!important}
-			                    .nsk-content-meta-info .floor-link-wrapper .nsx-floor-badge-dock{gap:1px!important}
+			                    .nsk-content-meta-info .floor-link-wrapper > a.nsx-floor-fused{padding:0 3px!important}
+			                    .nsk-content-meta-info .floor-link-wrapper > a.nsx-floor-fused::before,.nsk-content-meta-info .floor-link-wrapper > a.nsx-floor-fused::after{font-size:8px}
+			                    .nsk-content-meta-info .floor-link-wrapper > a.nsx-floor-fused-hot::after,.nsk-content-meta-info .floor-link-wrapper > a.nsx-floor-fused-pin::after{right:-6px;top:-6px}
+			                    .nsk-content-meta-info .floor-link-wrapper > a.nsx-floor-fused-both::before{right:-7px;top:3px}
+			                    .nsk-content-meta-info .floor-link-wrapper > a.nsx-floor-fused-both::after{right:-7px;top:-7px}
 			                }
 			            `);
 
@@ -1999,6 +2069,74 @@ body.dark-layout .nsx-sheet-item[data-a="filter"] .nsx-sheet-item-icon,html.dark
 			                return badges;
 			            };
 
+		            const FUSED_FLOOR_CLASSES = ["nsx-floor-fused", "nsx-floor-fused-hot", "nsx-floor-fused-pin", "nsx-floor-fused-both"];
+		            const getFloorLinkInHost = (host) => {
+		                if (!host || host.nodeType !== 1) return null;
+		                const floorWrap = host.querySelector?.(".floor-link-wrapper");
+		                if (!floorWrap || floorWrap.nodeType !== 1) return null;
+		                let link = floorWrap.querySelector?.("a.floor-link,a[href^=\"#\"]");
+		                if (link) return link;
+		                try {
+		                    const links = Array.from(floorWrap.querySelectorAll?.("a[href]") || []);
+		                    link = links.find((a) => /^#\d+$/.test(String(a.textContent || "").trim()) || /^#\d*$/.test(String(a.getAttribute?.("href") || "").trim())) || null;
+		                } catch { link = null; }
+		                return link;
+		            };
+
+		            const restoreHiddenCornerBadgesInHost = (host) => {
+		                if (!host || host.nodeType !== 1) return;
+		                try {
+		                    host.querySelectorAll?.("[data-nsx-corner-hidden-by-fused='1']")?.forEach?.((el) => {
+		                        if (!el || el.nodeType !== 1) return;
+		                        try {
+		                            el.style.display = el.dataset?.nsxCornerDisplay0 || "";
+		                            delete el.dataset.nsxCornerDisplay0;
+		                            delete el.dataset.nsxCornerHiddenByFused;
+		                        } catch { }
+		                    });
+		                } catch { }
+		            };
+
+		            const clearFloorCornerFusionState = (host) => {
+		                if (!host || host.nodeType !== 1) return;
+		                const link = getFloorLinkInHost(host);
+		                if (link) {
+		                    try { link.classList.remove(...FUSED_FLOOR_CLASSES); } catch { }
+		                }
+		                restoreHiddenCornerBadgesInHost(host);
+		            };
+
+		            const applyFloorCornerFusionState = (host, badges) => {
+		                if (!host || host.nodeType !== 1) return false;
+		                const link = getFloorLinkInHost(host);
+		                if (!link) return false;
+
+		                const hasHot = (badges || []).some((x) => x?.type === "hot");
+		                const hasPin = (badges || []).some((x) => x?.type === "pin");
+		                const stateCls = hasHot && hasPin
+		                    ? "nsx-floor-fused-both"
+		                    : (hasHot ? "nsx-floor-fused-hot" : (hasPin ? "nsx-floor-fused-pin" : ""));
+		                if (!stateCls) {
+		                    clearFloorCornerFusionState(host);
+		                    return true;
+		                }
+
+		                clearFloorCornerFusionState(host);
+		                try { link.classList.add("nsx-floor-fused", stateCls); } catch { }
+		                (badges || []).forEach(({ el }) => {
+		                    if (!el || el.nodeType !== 1) return;
+		                    // 融合模式下隐藏原角标节点，避免额外占位
+		                    try {
+		                        if (el.dataset?.nsxCornerHiddenByFused !== "1") {
+		                            el.dataset.nsxCornerDisplay0 = el.style.display || "";
+		                        }
+		                        el.style.display = "none";
+		                        el.dataset.nsxCornerHiddenByFused = "1";
+		                    } catch { }
+		                });
+		                return true;
+		            };
+
 		            const clearCornerBadgeSafePadding = (host) => {
 		                if (!host || host.nodeType !== 1) return;
 		                if (host.dataset?.nsxCornerPadR0 !== undefined) {
@@ -2006,47 +2144,16 @@ body.dark-layout .nsx-sheet-item[data-a="filter"] .nsx-sheet-item-icon,html.dark
 		                    try { delete host.dataset.nsxCornerPadR0; } catch { }
 		                }
 		                try { host.classList.remove("nsx-has-corner-badge"); } catch { }
-		                try {
-		                    host.querySelectorAll?.(".nsx-floor-badge-dock")?.forEach?.((dock) => {
-		                        if (!dock || dock.nodeType !== 1) return;
-		                        if ((dock.children?.length || 0) > 0) return;
-		                        dock.remove?.();
-		                    });
-		                } catch { }
-		            };
-
-		            const getFloorBadgeDockInHost = (host) => {
-		                if (!host || host.nodeType !== 1) return null;
-		                const floorWrap = host.querySelector?.(".floor-link-wrapper");
-		                if (!floorWrap || floorWrap.nodeType !== 1) return null;
-		                let dock = floorWrap.querySelector?.(".nsx-floor-badge-dock");
-		                if (!dock) {
-		                    dock = document.createElement("div");
-		                    dock.className = "nsx-floor-badge-dock";
-		                    floorWrap.appendChild(dock);
-		                }
-		                return dock;
-		            };
-
-		            const dockCornerBadgesUnderFloor = (host, badges) => {
-		                if (!host || host.nodeType !== 1) return false;
-		                const dock = getFloorBadgeDockInHost(host);
-		                if (!dock) return false;
-		                (badges || []).forEach(({ el }) => {
-		                    if (!el || el.nodeType !== 1) return;
-		                    try {
-		                        if (el.parentElement !== dock) dock.appendChild(el);
-		                    } catch { }
-		                });
-		                return true;
 		            };
 
 		            const applyCornerBadgeSafePadding = (host) => {
 		                if (!host || host.nodeType !== 1) return;
+		                restoreHiddenCornerBadgesInHost(host);
 
 		                const found = detectCornerBadgesInHost(host);
 		                if (!found.length) {
 		                    clearCornerBadgeSafePadding(host);
+		                    clearFloorCornerFusionState(host);
 		                    return;
 		                }
 
@@ -2067,8 +2174,8 @@ body.dark-layout .nsx-sheet-item[data-a="filter"] .nsx-sheet-item-icon,html.dark
 		                    try { el.classList.add("nsx-corner-badge", type === "hot" ? "nsx-hot-badge" : "nsx-pin-badge"); } catch { }
 		                });
 
-		                // 目标行为：角标固定挂到楼层号下方（HOT / 图钉统一）
-		                if (dockCornerBadgesUnderFloor(host, found)) {
+		                // 目标行为：融合到楼层号本体（不额外占位）
+		                if (applyFloorCornerFusionState(host, found)) {
 		                    clearCornerBadgeSafePadding(host);
 		                    return;
 		                }
