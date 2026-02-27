@@ -999,10 +999,18 @@
 		                    }
 				                    const authorInfo = el.closest?.(".author-info");
 				                    applyOpBadgeStyle(el);
+				                    const floorTightHost = (() => {
+				                        try {
+				                            if (metaInfo?.querySelector?.(".floor-link-wrapper")) return metaInfo;
+				                            const lineHost = authorInfo?.parentElement;
+				                            if (lineHost?.querySelector?.(".floor-link-wrapper")) return lineHost;
+				                        } catch { }
+				                        return metaInfo || null;
+				                    })();
 				                    if (!narrowScreen && authorInfo) {
 				                        try { authorInfo.classList.remove("nsx-author-tight"); } catch { }
 				                        try { authorInfo.classList.remove("nsx-author-nowrap"); } catch { }
-				                        try { metaInfo.classList.remove("nsx-floor-tight"); } catch { }
+				                        try { floorTightHost?.classList?.remove?.("nsx-floor-tight"); } catch { }
 				                        autoAbbrevRoleBadges(authorInfo, false);
 				                    }
 				                    const scheduleAuthorNoWrapIfWrapped = () => {
@@ -1120,10 +1128,10 @@
 				                            if (shouldCompact) {
 				                                try { if (username && !el.title) el.title = username; } catch { }
 				                                try { authorInfo.classList.add("nsx-author-tight"); } catch { }
-				                                try { metaInfo.classList.add("nsx-floor-tight"); } catch { }
+				                                try { floorTightHost?.classList?.add?.("nsx-floor-tight"); } catch { }
 				                            } else {
 				                                try { authorInfo.classList.remove("nsx-author-tight"); } catch { }
-				                                try { metaInfo.classList.remove("nsx-floor-tight"); } catch { }
+				                                try { floorTightHost?.classList?.remove?.("nsx-floor-tight"); } catch { }
 				                            }
 				                            autoAbbrevRoleBadges(authorInfo, shouldCompact);
 				                        };

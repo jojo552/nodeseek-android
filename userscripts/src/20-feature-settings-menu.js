@@ -1939,12 +1939,18 @@ body.dark-layout .nsx-sheet-item[data-a="filter"] .nsx-sheet-item-icon,html.dark
 			                    background:linear-gradient(180deg,rgba(55,48,163,.34),rgba(76,29,149,.24))!important;
 			                    color:#ddd6fe!important
 			                }
-			                .nsk-content-meta-info.nsx-floor-tight .floor-link-wrapper{gap:1px!important}
-			                .nsk-content-meta-info.nsx-floor-tight .floor-link-wrapper > a.nsx-floor-fused{padding:0 3px!important}
-			                .nsk-content-meta-info.nsx-floor-tight .floor-link-wrapper > a.nsx-floor-fused::before,.nsk-content-meta-info.nsx-floor-tight .floor-link-wrapper > a.nsx-floor-fused::after{font-size:8px}
-			                .nsk-content-meta-info.nsx-floor-tight .floor-link-wrapper > a.nsx-floor-fused-hot::after,.nsk-content-meta-info.nsx-floor-tight .floor-link-wrapper > a.nsx-floor-fused-pin::after{right:-6px;top:-6px}
-			                .nsk-content-meta-info.nsx-floor-tight .floor-link-wrapper > a.nsx-floor-fused-both::before{right:-7px;top:3px}
-			                .nsk-content-meta-info.nsx-floor-tight .floor-link-wrapper > a.nsx-floor-fused-both::after{right:-7px;top:-7px}
+			                .nsk-content-meta-info.nsx-floor-tight .floor-link-wrapper,.nsx-floor-tight .floor-link-wrapper{gap:1px!important}
+			                .nsk-content-meta-info.nsx-floor-tight .floor-link-wrapper > a.nsx-floor-fused,.nsx-floor-tight .floor-link-wrapper > a.nsx-floor-fused{
+			                    padding:0 2px!important;
+			                    border-radius:9px!important;
+			                    font-size:12px!important;
+			                    box-shadow:none!important
+			                }
+			                /* 紧凑态下隐藏右上角火焰/图钉，避免与身份胶囊争夺视觉与空间 */
+			                .nsk-content-meta-info.nsx-floor-tight .floor-link-wrapper > a.nsx-floor-fused-hot::after,.nsk-content-meta-info.nsx-floor-tight .floor-link-wrapper > a.nsx-floor-fused-pin::after,.nsk-content-meta-info.nsx-floor-tight .floor-link-wrapper > a.nsx-floor-fused-both::before,.nsk-content-meta-info.nsx-floor-tight .floor-link-wrapper > a.nsx-floor-fused-both::after,
+			                .nsx-floor-tight .floor-link-wrapper > a.nsx-floor-fused-hot::after,.nsx-floor-tight .floor-link-wrapper > a.nsx-floor-fused-pin::after,.nsx-floor-tight .floor-link-wrapper > a.nsx-floor-fused-both::before,.nsx-floor-tight .floor-link-wrapper > a.nsx-floor-fused-both::after{
+			                    content:""!important
+			                }
 			                @media (max-width:768px){
 			                    .nsx-corner-badge{
 			                        min-height:13px!important;
