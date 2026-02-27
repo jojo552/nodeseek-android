@@ -874,7 +874,8 @@
 	                };
 	                const applyRoleBadgeCountLimit = (authorInfo, orderedTags, shouldCompact, crowdedNow) => {
 	                    if (!authorInfo) return;
-	                    const tags = Array.isArray(orderedTags) ? orderedTags.filter(Boolean) : [];
+	                    const tags = collectRoleBadges(authorInfo);
+	                    if (!tags.length) return;
 	                    tags.forEach((tag) => restoreRoleBadgeVisibility(tag));
 	                    removeRoleMoreBadge(authorInfo);
 	                    if (tags.length <= ROLE_BADGE_MAX_VISIBLE) return;
@@ -908,15 +909,30 @@
 	                    const rest = compactOrdered.filter((tag) => !forced.includes(tag));
 	                    const slots = Math.max(0, ROLE_BADGE_MAX_VISIBLE - forced.length);
 	                    const visible = [...forced, ...rest.slice(0, slots)];
-	                    const hidden = compactOrdered.filter((tag) => !visible.includes(tag));
+	                    const visibleSet = new Set(visible);
+	                    const hidden = tags.filter((tag) => !visibleSet.has(tag));
 	                    hidden.forEach((tag) => hideRoleBadgeByLimit(tag));
 	                    if (!hidden.length) return;
+
+	                    // 楼主标签强制置于可见标签第一位（真实 DOM 顺序）
+	                    const opTag = forced[0] || null;
+	                    if (opTag && visibleSet.has(opTag)) {
+	                        const visibleDom = collectRoleBadges(authorInfo).filter((tag) => visibleSet.has(tag));
+	                        const firstVisible = visibleDom[0] || null;
+	                        if (firstVisible && firstVisible !== opTag) {
+	                            try { firstVisible.insertAdjacentElement?.("beforebegin", opTag); } catch { }
+	                        }
+	                    }
+
 	                    const more = ensureRoleMoreBadge(authorInfo);
 	                    if (!more) return;
 	                    const tip = hidden.map((tag) => getRoleBadgeRawText(tag)).filter(Boolean).join(" / ");
 	                    more.textContent = `+${hidden.length}`;
 	                    if (tip) more.title = `隐藏标签：${tip}`;
-	                    const anchor = visible[visible.length - 1] || visible[0] || tags[0];
+
+	                    // +N 始终挂到最右侧“最后一个可见标签”后面，避免出现在中间
+	                    const visibleDomAfter = collectRoleBadges(authorInfo).filter((tag) => visibleSet.has(tag));
+	                    const anchor = visibleDomAfter[visibleDomAfter.length - 1] || visibleDomAfter[0] || tags[tags.length - 1] || tags[0];
 	                    try { anchor?.insertAdjacentElement?.("afterend", more); } catch { }
 	                };
 	                const autoAbbrevRoleBadges = (authorInfo, shouldCompact) => {
