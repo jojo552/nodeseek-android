@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,7 @@ import android.window.OnBackInvokedDispatcher;
 import android.webkit.CookieManager;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
+import android.webkit.RenderProcessGoneDetail;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -26,6 +28,7 @@ import androidx.core.view.WindowInsetsCompat;
 public class DetailActivity extends Activity {
     public static final String EXTRA_POST_URL = "extra_post_url";
     public static final String EXTRA_POST_TITLE = "extra_post_title";
+    private static final String TAG = "NS_DETAIL";
 
     private static final int APP_BAR_COLOR = 0xFF13A6E3;
     private static final String HOST_PRIMARY = "www.nodeseek.com";
@@ -145,12 +148,42 @@ public class DetailActivity extends Activity {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 Uri uri = request.getUrl();
+                if (uri == null) {
+                    return true;
+                }
                 String host = uri.getHost();
                 if (HOST_PRIMARY.equals(host) || HOST_FALLBACK.equals(host)) {
                     return false;
                 }
-                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-                startActivity(intent);
+                try {
+                    Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                    startActivity(intent);
+                } catch (Exception ignored) {
+                }
+                return true;
+            }
+
+            @Override
+            public boolean onRenderProcessGone(WebView view, RenderProcessGoneDetail detail) {
+                String reason = (detail != null && detail.didCrash()) ? "crashed" : "killed";
+                Log.e(TAG, "webview_render_process_gone=" + reason);
+
+                loadingView.setText(getString(R.string.detail_error, "渲染进程异常，正在恢复"));
+                loadingView.setVisibility(View.VISIBLE);
+                try {
+                    if (view != null) {
+                        view.stopLoading();
+                        view.setWebChromeClient(null);
+                        view.setWebViewClient(null);
+                        ViewGroup parent = (ViewGroup) view.getParent();
+                        if (parent != null) {
+                            parent.removeView(view);
+                        }
+                        view.destroy();
+                    }
+                } catch (Throwable ignored) {
+                }
+                recreate();
                 return true;
             }
         });

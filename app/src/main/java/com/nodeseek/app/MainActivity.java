@@ -25,6 +25,7 @@ import android.webkit.WebBackForwardList;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
+import android.webkit.RenderProcessGoneDetail;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -220,7 +221,44 @@ public class MainActivity extends Activity {
                 if (isNodeSeekHost(host)) {
                     return false;
                 }
-                startActivity(new Intent(Intent.ACTION_VIEW, uri));
+                if (uri == null) {
+                    return true;
+                }
+                try {
+                    startActivity(new Intent(Intent.ACTION_VIEW, uri));
+                } catch (Exception ignored) {
+                }
+                return true;
+            }
+
+            @Override
+            public boolean onRenderProcessGone(WebView view, RenderProcessGoneDetail detail) {
+                String reason = (detail != null && detail.didCrash()) ? "crashed" : "killed";
+                Log.e(BASELINE_TAG, "webview_render_process_gone=" + reason);
+
+                stopRefreshingIndicator();
+                NodeseekUserscriptRuntime.setPullToRefreshSuppressed(false);
+                mainHandler.removeCallbacks(webThemeSyncRunnable);
+                mainHandler.removeCallbacks(statusBarSyncRunnable);
+                mainHandler.removeCallbacks(refreshTimeoutRunnable);
+
+                try {
+                    if (view != null) {
+                        view.stopLoading();
+                        view.setWebChromeClient(null);
+                        view.setWebViewClient(null);
+                        ViewGroup parent = (ViewGroup) view.getParent();
+                        if (parent != null) {
+                            parent.removeView(view);
+                        }
+                        view.destroy();
+                    }
+                } catch (Throwable ignored) {
+                }
+
+                textEmpty.setText(getString(R.string.error_load_posts, "WebView 渲染进程异常，正在恢复"));
+                textEmpty.setVisibility(View.VISIBLE);
+                recreate();
                 return true;
             }
         });
