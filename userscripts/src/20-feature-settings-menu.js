@@ -4136,3 +4136,62 @@ body.dark-layout .nsx-sheet-item[data-a="filter"] .nsx-sheet-item-icon,html.dark
         define(openInNewTabFix);
 
         /* ==========================================================================
+           [ 🧭 辅助工具 ] - 首页置顶轮播点击兜底
+           ========================================================================== */
+        const topicCarouselTapFix = {
+            id: "topicCarouselTapFix",
+            order: 395,
+            match: ctx => ctx.isList,
+            init() {
+                addStyle("nsx-topic-carousel-tap-fix", `
+                .topic-carousel-wrapper .carousel-mask{pointer-events:none!important}
+                .topic-carousel-panel .topic-carousel-item.slide-fade-leave-to,
+                .topic-carousel-panel .topic-carousel-item.animate__fadeOutLeft,
+                .topic-carousel-panel .topic-carousel-item.animate__fadeOut{pointer-events:none!important}
+                `);
+
+                window.__nsxRuntime ||= {};
+                if (window.__nsxRuntime.topicCarouselTapFixBound) return;
+                window.__nsxRuntime.topicCarouselTapFixBound = true;
+
+                const resolvePostLink = (item) => item?.querySelector?.(
+                    '.post-title a[href^="/post-"], .post-title a[href*="/post-"], a[href^="/post-"], a[href*="/post-"]'
+                );
+
+                const isPrimaryClick = (e) => {
+                    if (e.button !== undefined && e.button !== 0) return false;
+                    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return false;
+                    return true;
+                };
+
+                document.addEventListener("click", e => {
+                    if (!isPrimaryClick(e) || e.defaultPrevented) return;
+
+                    const target = e.target;
+                    if (!(target instanceof Element)) return;
+
+                    const item = target.closest(".topic-carousel-item");
+                    if (!item || !item.closest(".topic-carousel-panel")) return;
+                    if (target.closest("a[href],button,input,textarea,select,label,summary")) return;
+
+                    const sel = window.getSelection?.();
+                    if (sel && String(sel.type || "").toLowerCase() === "range") return;
+
+                    const postLink = resolvePostLink(item);
+                    const href = String(postLink?.getAttribute?.("href") || "").trim();
+                    if (!href || href.startsWith("#") || /^javascript:/i.test(href)) return;
+
+                    try { e.preventDefault(); } catch { }
+                    try { e.stopPropagation(); } catch { }
+                    try {
+                        const next = new URL(href, location.href);
+                        location.assign(next.href);
+                    } catch {
+                        location.assign(href);
+                    }
+                }, true);
+            }
+        };
+        define(topicCarouselTapFix);
+
+        /* ==========================================================================
