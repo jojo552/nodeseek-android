@@ -905,7 +905,21 @@
 	                        return 0;
 	                    });
 	                    const isOpTag = (tag) => !!(tag?.classList?.contains?.("nsx-op-badge") || /楼主|^op$/i.test(getRoleBadgeRawText(tag)));
-	                    const forced = compactOrdered.filter((tag) => isOpTag(tag)).slice(0, 1);
+	                    const isAdminPriorityTag = (tag) => {
+	                        if (!tag) return false;
+	                        if (tag.classList?.contains?.("nsx-admin-badge")) return true;
+	                        const raw = String(getRoleBadgeRawText(tag) || "").trim();
+	                        const text = raw.replace(/\s+/g, "");
+	                        const lower = text.toLowerCase();
+	                        if (text === "管理" || text === "版主" || text === "管理员") return true;
+	                        if (lower === "admin" || lower === "moderator" || lower === "mod") return true;
+	                        return false;
+	                    };
+	                    const forced = [];
+	                    const opTagForced = compactOrdered.find((tag) => isOpTag(tag)) || null;
+	                    if (opTagForced) forced.push(opTagForced);
+	                    const adminTagForced = compactOrdered.find((tag) => !forced.includes(tag) && isAdminPriorityTag(tag)) || null;
+	                    if (adminTagForced) forced.push(adminTagForced);
 	                    const rest = compactOrdered.filter((tag) => !forced.includes(tag));
 	                    const slots = Math.max(0, ROLE_BADGE_MAX_VISIBLE - forced.length);
 	                    const visible = [...forced, ...rest.slice(0, slots)];
@@ -914,13 +928,29 @@
 	                    hidden.forEach((tag) => hideRoleBadgeByLimit(tag));
 	                    if (!hidden.length) return;
 
-	                    // 楼主标签强制置于可见标签第一位（真实 DOM 顺序）
-	                    const opTag = forced[0] || null;
-	                    if (opTag && visibleSet.has(opTag)) {
+	                    // 强制顺序：楼主第一，管理/版主第二（若存在）
+	                    const opTag = opTagForced && visibleSet.has(opTagForced) ? opTagForced : null;
+	                    const adminTag = adminTagForced && visibleSet.has(adminTagForced) ? adminTagForced : null;
+	                    if (opTag) {
 	                        const visibleDom = collectRoleBadges(authorInfo).filter((tag) => visibleSet.has(tag));
 	                        const firstVisible = visibleDom[0] || null;
 	                        if (firstVisible && firstVisible !== opTag) {
 	                            try { firstVisible.insertAdjacentElement?.("beforebegin", opTag); } catch { }
+	                        }
+	                    }
+	                    if (adminTag) {
+	                        const visibleDom = collectRoleBadges(authorInfo).filter((tag) => visibleSet.has(tag));
+	                        const firstVisible = visibleDom[0] || null;
+	                        if (firstVisible === adminTag && opTag && opTag !== adminTag) {
+	                            try { firstVisible.insertAdjacentElement?.("beforebegin", opTag); } catch { }
+	                        }
+	                        const latestVisibleDom = collectRoleBadges(authorInfo).filter((tag) => visibleSet.has(tag));
+	                        const latestFirst = latestVisibleDom[0] || null;
+	                        const latestSecond = latestVisibleDom[1] || null;
+	                        if (latestFirst && latestFirst === opTag && latestSecond && latestSecond !== adminTag) {
+	                            try { latestFirst.insertAdjacentElement?.("afterend", adminTag); } catch { }
+	                        } else if (!opTag && latestFirst && latestFirst !== adminTag) {
+	                            try { latestFirst.insertAdjacentElement?.("beforebegin", adminTag); } catch { }
 	                        }
 	                    }
 
