@@ -119,11 +119,9 @@
                         if (s && d) d.innerHTML = s.innerHTML;
                     });
 
-                    // 瀑布流自动加载会在同一页内不断请求下一页：
-                    // - 若使用 pushState，会把每次自动翻页都写入历史栈
-                    // - 安卓侧“返回手势/返回键”会先回退这些虚拟记录，导致无法“一步返回上个页面”
-                    // 这里使用 replaceState：保持地址栏同步到最新页，但不污染历史记录
-                    try { history.replaceState(null, "", nextUrl); } catch { }
+                    // 瀑布流仅做“内容追加”，不改地址栏：
+                    // - 避免刷新后停留在自动加载到的 page=2/3...
+                    // - 保持入口页 URL 不变，刷新后从当前入口页重新加载
                 } catch (e) { ctx.env.error("autoLoading", e); }
                 busy = false;
             };
