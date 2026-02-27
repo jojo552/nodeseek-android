@@ -164,7 +164,7 @@
 		.nsx-broker-badge{border:1px solid rgba(217,119,6,.34)!important;background:linear-gradient(180deg,rgba(255,251,235,.98),rgba(254,243,199,.86))!important;color:#b45309!important}
 		.nsx-broker-badge::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;background:linear-gradient(180deg,#fbbf24 0%,#f59e0b 55%,#b45309 100%);opacity:.98}
 		body.dark-layout .nsx-broker-badge,html.dark .nsx-broker-badge{border-color:rgba(251,191,36,.42)!important;background:linear-gradient(180deg,rgba(120,53,15,.92),rgba(146,64,14,.82))!important;box-shadow:0 1px 4px rgba(0,0,0,.32)!important;color:#fde68a!important}
-		.nsx-role-more-badge{position:relative;display:inline-flex!important;align-items:center!important;justify-content:center!important;flex:0 0 auto!important;height:14px!important;line-height:14px!important;padding:0 5px!important;margin-left:5px!important;border-radius:999px!important;border:1px dashed rgba(148,163,184,.5)!important;background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(248,250,252,.9))!important;color:#475569!important;font-size:9px!important;font-weight:760!important;letter-spacing:0!important;cursor:pointer}
+		.nsx-role-more-badge{position:relative;z-index:12;display:inline-flex!important;align-items:center!important;justify-content:center!important;flex:0 0 auto!important;height:14px!important;line-height:14px!important;padding:0 5px!important;margin-left:3px!important;border-radius:999px!important;border:1px dashed rgba(148,163,184,.5)!important;background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(248,250,252,.9))!important;color:#475569!important;font-size:9px!important;font-weight:760!important;letter-spacing:0!important;cursor:pointer}
 		body.dark-layout .nsx-role-more-badge,html.dark .nsx-role-more-badge{border-color:rgba(148,163,184,.56)!important;background:linear-gradient(180deg,rgba(51,65,85,.88),rgba(30,41,59,.78))!important;color:#cbd5e1!important}
 		.nsx-role-more-pop{position:fixed;z-index:2147483000;max-width:min(72vw,240px);max-height:min(46vh,280px);overflow:auto;border:1px solid rgba(148,163,184,.36);border-radius:10px;padding:6px;background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(248,250,252,.94));box-shadow:0 10px 24px rgba(15,23,42,.2)}
 		body.dark-layout .nsx-role-more-pop,html.dark .nsx-role-more-pop{border-color:rgba(148,163,184,.46);background:linear-gradient(180deg,rgba(30,41,59,.95),rgba(15,23,42,.92));box-shadow:0 12px 26px rgba(0,0,0,.45)}
@@ -891,7 +891,9 @@
 	                    const tip = hidden.map((tag) => getRoleBadgeRawText(tag)).filter(Boolean).join(" / ");
 	                    more.textContent = `+${hidden.length}`;
 	                    if (tip) more.title = `隐藏标签：${tip}`;
-	                    const anchor = visible[visible.length - 1] || visible[0] || tags[0];
+	                    // 拥挤场景把 +N 往左放，避免被右侧楼层区遮挡
+	                    const preferLeft = !!(shouldCompact || crowdedNow || narrowScreen);
+	                    const anchor = preferLeft ? (visible[0] || visible[visible.length - 1] || tags[0]) : (visible[visible.length - 1] || visible[0] || tags[0]);
 	                    try { anchor?.insertAdjacentElement?.("afterend", more); } catch { }
 	                };
 	                const autoAbbrevRoleBadges = (authorInfo, shouldCompact) => {
@@ -1106,20 +1108,15 @@
 				                        try { authorInfo?.parentElement?.querySelectorAll?.(".floor-link-wrapper")?.forEach?.(n => n && set.add(n)); } catch { }
 				                        return Array.from(set);
 				                    };
-				                    const setFloorTightState = (level) => {
-				                        const lv = Math.max(0, Math.min(2, Number(level) || 0));
+				                    const setFloorTightState = () => {
 				                        try {
-				                            if (lv > 0) floorTightHost?.classList?.add?.("nsx-floor-tight");
-				                            else floorTightHost?.classList?.remove?.("nsx-floor-tight");
-				                            if (lv >= 2) floorTightHost?.classList?.add?.("nsx-floor-tight-2");
-				                            else floorTightHost?.classList?.remove?.("nsx-floor-tight-2");
+				                            floorTightHost?.classList?.remove?.("nsx-floor-tight");
+				                            floorTightHost?.classList?.remove?.("nsx-floor-tight-2");
 				                        } catch { }
 				                        getFloorWrappers().forEach((wrap) => {
 				                            try {
-				                                if (lv > 0) wrap.classList.add("nsx-floor-tight");
-				                                else wrap.classList.remove("nsx-floor-tight");
-				                                if (lv >= 2) wrap.classList.add("nsx-floor-tight-2");
-				                                else wrap.classList.remove("nsx-floor-tight-2");
+				                                wrap.classList.remove("nsx-floor-tight");
+				                                wrap.classList.remove("nsx-floor-tight-2");
 				                                wrap.querySelectorAll?.("a.nsx-floor-fused,a.floor-link,a[href^=\"#\"]")?.forEach?.((link) => {
 				                                    if (!link) return;
 				                                    const txt = String(link.textContent || "").trim();
