@@ -2109,6 +2109,27 @@ body.dark-layout .nsx-sheet-item[data-a="filter"] .nsx-sheet-item-icon,html.dark
 		                } catch { link = null; }
 		                return link;
 		            };
+		            const syncFloorLinkHashByTightState = (host, link) => {
+		                if (!link || link.nodeType !== 1) return;
+		                let tight = false;
+		                try {
+		                    const wrap = link.closest?.(".floor-link-wrapper");
+		                    tight = !!(
+		                        host?.classList?.contains?.("nsx-floor-tight")
+		                        || host?.classList?.contains?.("nsx-floor-tight-2")
+		                        || wrap?.classList?.contains?.("nsx-floor-tight")
+		                        || wrap?.classList?.contains?.("nsx-floor-tight-2")
+		                    );
+		                } catch { }
+		                const txt = String(link.textContent || "").trim();
+		                if (!link.dataset?.nsxFloorRawText && txt) {
+		                    try { link.dataset.nsxFloorRawText = txt; } catch { }
+		                }
+		                const raw = String(link.dataset?.nsxFloorRawText || txt || "").trim();
+		                if (!raw) return;
+		                const nextText = tight ? raw.replace(/^#\s*/, "") : raw;
+		                if (String(link.textContent || "").trim() !== nextText) link.textContent = nextText;
+		            };
 
 		            const restoreHiddenCornerBadgesInHost = (host) => {
 		                if (!host || host.nodeType !== 1) return;
@@ -2136,6 +2157,7 @@ body.dark-layout .nsx-sheet-item[data-a="filter"] .nsx-sheet-item-icon,html.dark
 		                const link = getFloorLinkInHost(host);
 		                if (link) {
 		                    try { link.classList.remove(...FUSED_FLOOR_CLASSES); } catch { }
+		                    syncFloorLinkHashByTightState(host, link);
 		                }
 		                restoreHiddenCornerBadgesInHost(host);
 		            };
@@ -2157,6 +2179,7 @@ body.dark-layout .nsx-sheet-item[data-a="filter"] .nsx-sheet-item-icon,html.dark
 
 		                clearFloorCornerFusionState(host);
 		                try { link.classList.add("nsx-floor-fused", stateCls); } catch { }
+		                syncFloorLinkHashByTightState(host, link);
 		                (badges || []).forEach(({ el }) => {
 		                    if (!el || el.nodeType !== 1) return;
 		                    // 保护：绝不隐藏楼层链接本体及其子节点

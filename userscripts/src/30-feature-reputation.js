@@ -1035,7 +1035,7 @@
 				                                    }
 				                                    const raw = String(link.dataset?.nsxFloorRawText || txt || "").trim();
 				                                    if (!raw) return;
-				                                    const nextText = lv >= 2 ? raw.replace(/^#\s*/, "") : raw;
+				                                    const nextText = lv > 0 ? raw.replace(/^#\s*/, "") : raw;
 				                                    if (String(link.textContent || "").trim() !== nextText) link.textContent = nextText;
 				                                });
 				                            } catch { }
