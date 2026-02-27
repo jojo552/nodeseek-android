@@ -1103,6 +1103,18 @@
 		                                    }
 		                                } catch { }
 		                            }
+		                            // 7) 兜底：开启“楼层号融合”后，右侧占位更紧凑但仍会压缩作者行；
+		                            // 某些机型/WebView 下前述几何检测可能误判为“不拥挤”，这里按场景兜底触发紧凑缩写
+		                            if (!wrapped && !crowded) {
+		                                try {
+		                                    const metaHost = authorInfo.closest?.(".nsk-content-meta-info");
+		                                    const hasFusedFloor = !!metaHost?.querySelector?.(".floor-link-wrapper > a.nsx-floor-fused");
+		                                    if (narrowScreen && hasFusedFloor) {
+		                                        const roleCount = collectRoleBadges(authorInfo).length;
+		                                        if (roleCount >= 2) crowded = true;
+		                                    }
+		                                } catch { }
+		                            }
 				                            const shouldCompact = wrapped || crowded;
 				                            if (shouldCompact) {
 				                                try { if (username && !el.title) el.title = username; } catch { }
