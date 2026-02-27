@@ -1941,17 +1941,17 @@ body.dark-layout .nsx-sheet-item[data-a="filter"] .nsx-sheet-item-icon,html.dark
 			                }
 			                .nsk-content-meta-info.nsx-floor-tight .floor-link-wrapper,.nsx-floor-tight .floor-link-wrapper,.floor-link-wrapper.nsx-floor-tight{gap:1px!important}
 			                .nsk-content-meta-info.nsx-floor-tight .floor-link-wrapper > a.nsx-floor-fused,.nsx-floor-tight .floor-link-wrapper > a.nsx-floor-fused,.floor-link-wrapper.nsx-floor-tight > a.nsx-floor-fused{
-			                    padding:0 2px!important;
-			                    border-radius:9px!important;
-			                    font-size:12px!important;
-			                    box-shadow:none!important
+			                    padding:1px 4px!important;
+			                    border-radius:999px!important;
+			                    font-size:inherit!important;
+			                    box-shadow:0 1px 3px rgba(15,23,42,.12)!important
 			                }
 			                .nsk-content-meta-info.nsx-floor-tight.nsx-floor-tight-2 .floor-link-wrapper,.nsx-floor-tight.nsx-floor-tight-2 .floor-link-wrapper,.floor-link-wrapper.nsx-floor-tight.nsx-floor-tight-2{gap:0!important}
 			                .nsk-content-meta-info.nsx-floor-tight.nsx-floor-tight-2 .floor-link-wrapper > a.nsx-floor-fused,.nsx-floor-tight.nsx-floor-tight-2 .floor-link-wrapper > a.nsx-floor-fused,.floor-link-wrapper.nsx-floor-tight.nsx-floor-tight-2 > a.nsx-floor-fused{
-			                    padding:0 1px!important;
-			                    border-radius:7px!important;
-			                    font-size:10.5px!important;
-			                    letter-spacing:0!important
+			                    padding:1px 4px!important;
+			                    border-radius:999px!important;
+			                    font-size:inherit!important;
+			                    letter-spacing:inherit!important
 			                }
 			                /* 紧凑态下隐藏右上角火焰/图钉，避免与身份胶囊争夺视觉与空间 */
 			                .nsk-content-meta-info.nsx-floor-tight .floor-link-wrapper > a.nsx-floor-fused-hot::after,.nsk-content-meta-info.nsx-floor-tight .floor-link-wrapper > a.nsx-floor-fused-pin::after,.nsk-content-meta-info.nsx-floor-tight .floor-link-wrapper > a.nsx-floor-fused-both::before,.nsk-content-meta-info.nsx-floor-tight .floor-link-wrapper > a.nsx-floor-fused-both::after,

@@ -166,6 +166,12 @@
 		body.dark-layout .nsx-broker-badge,html.dark .nsx-broker-badge{border-color:rgba(251,191,36,.42)!important;background:linear-gradient(180deg,rgba(120,53,15,.92),rgba(146,64,14,.82))!important;box-shadow:0 1px 4px rgba(0,0,0,.32)!important;color:#fde68a!important}
 		.nsx-role-more-badge{position:relative;display:inline-flex!important;align-items:center!important;justify-content:center!important;flex:0 0 auto!important;height:14px!important;line-height:14px!important;padding:0 5px!important;margin-left:5px!important;border-radius:999px!important;border:1px dashed rgba(148,163,184,.5)!important;background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(248,250,252,.9))!important;color:#475569!important;font-size:9px!important;font-weight:760!important;letter-spacing:0!important;cursor:pointer}
 		body.dark-layout .nsx-role-more-badge,html.dark .nsx-role-more-badge{border-color:rgba(148,163,184,.56)!important;background:linear-gradient(180deg,rgba(51,65,85,.88),rgba(30,41,59,.78))!important;color:#cbd5e1!important}
+		.nsx-role-more-pop{position:fixed;z-index:2147483000;max-width:min(72vw,240px);max-height:min(46vh,280px);overflow:auto;border:1px solid rgba(148,163,184,.36);border-radius:10px;padding:6px;background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(248,250,252,.94));box-shadow:0 10px 24px rgba(15,23,42,.2)}
+		body.dark-layout .nsx-role-more-pop,html.dark .nsx-role-more-pop{border-color:rgba(148,163,184,.46);background:linear-gradient(180deg,rgba(30,41,59,.95),rgba(15,23,42,.92));box-shadow:0 12px 26px rgba(0,0,0,.45)}
+		.nsx-role-more-pop .nsx-role-more-item{display:block;line-height:1.35;padding:3px 5px;border-radius:7px;font-size:12px;font-weight:650;color:#334155;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+		.nsx-role-more-pop .nsx-role-more-item + .nsx-role-more-item{margin-top:3px}
+		.nsx-role-more-pop .nsx-role-more-item:hover{background:rgba(148,163,184,.18)}
+		body.dark-layout .nsx-role-more-pop .nsx-role-more-item,html.dark .nsx-role-more-pop .nsx-role-more-item{color:#e2e8f0}
 		.nsx-mute-badge{display:inline-flex!important;align-items:center!important;justify-content:center!important;flex:0 0 auto!important;height:14px!important;line-height:14px!important;padding:0 5px!important;margin-left:5px!important;border-radius:999px!important;border:1px solid #ffc1bb!important;background:#fff2f1!important;box-shadow:none!important;font-size:9.5px!important;font-weight:760!important;letter-spacing:0!important;color:#cf1322!important}
 		.nsx-mute-badge.nsx-mute-badge-secondary{height:13px!important;line-height:13px!important;padding:0 4px!important;margin:0 6px 0 0!important;font-size:9px!important;vertical-align:middle!important;opacity:.95}
 		.nsk-content-meta-info time + .nsx-mute-badge.nsx-mute-badge-secondary{margin-left:6px!important}
@@ -627,8 +633,11 @@
 	                };
 	                const ROLE_BADGE_SELECTOR = ".nsx-op-badge,.nsx-blogger-badge,.nsx-owner-badge,.nsx-oneman-badge,.nsx-admin-badge,.nsx-dev-badge,.nsx-detective-badge,.nsx-broker-badge";
 	                const ROLE_BADGE_PRIORITY = ["nsx-oneman-badge", "nsx-detective-badge", "nsx-broker-badge", "nsx-dev-badge", "nsx-admin-badge", "nsx-owner-badge", "nsx-blogger-badge", "nsx-op-badge"];
-	                const ROLE_BADGE_REVEAL_MS = 1800;
 	                const ROLE_BADGE_MAX_VISIBLE = 2;
+	                let roleMorePopupEl = null;
+	                let roleMorePopupAnchor = null;
+	                let roleMorePopupDocHandler = null;
+	                let roleMorePopupResizeHandler = null;
 	                const getRoleOverflowRow = (authorInfo) => {
 	                    const parent = authorInfo?.parentElement;
 	                    if (!parent) return null;
@@ -668,9 +677,76 @@
 	                    if (!authorInfo) return null;
 	                    try { return authorInfo.querySelector?.(".nsx-role-more-badge") || null; } catch { return null; }
 	                };
+	                const closeRoleMorePopup = () => {
+	                    if (roleMorePopupEl) {
+	                        try { roleMorePopupEl.remove(); } catch { }
+	                    }
+	                    roleMorePopupEl = null;
+	                    roleMorePopupAnchor = null;
+	                    if (roleMorePopupDocHandler) {
+	                        try { document.removeEventListener("pointerdown", roleMorePopupDocHandler, true); } catch { }
+	                        roleMorePopupDocHandler = null;
+	                    }
+	                    if (roleMorePopupResizeHandler) {
+	                        try { window.removeEventListener("resize", roleMorePopupResizeHandler, true); } catch { }
+	                        try { window.removeEventListener("scroll", roleMorePopupResizeHandler, true); } catch { }
+	                        roleMorePopupResizeHandler = null;
+	                    }
+	                };
+	                const openRoleMorePopup = (anchor, labels) => {
+	                    if (!anchor || !Array.isArray(labels) || !labels.length) return;
+	                    if (roleMorePopupEl && roleMorePopupAnchor === anchor) {
+	                        closeRoleMorePopup();
+	                        return;
+	                    }
+	                    closeRoleMorePopup();
+	                    const pop = document.createElement("div");
+	                    pop.className = "nsx-role-more-pop";
+	                    labels.forEach((label) => {
+	                        const item = document.createElement("div");
+	                        item.className = "nsx-role-more-item";
+	                        item.textContent = String(label || "").trim();
+	                        if (item.textContent) pop.appendChild(item);
+	                    });
+	                    if (!pop.childElementCount) return;
+	                    document.body.appendChild(pop);
+	                    roleMorePopupEl = pop;
+	                    roleMorePopupAnchor = anchor;
+	                    const place = () => {
+	                        if (!roleMorePopupEl || !roleMorePopupAnchor?.isConnected) { closeRoleMorePopup(); return; }
+	                        const ar = roleMorePopupAnchor.getBoundingClientRect?.();
+	                        if (!ar) { closeRoleMorePopup(); return; }
+	                        const pr = roleMorePopupEl.getBoundingClientRect?.();
+	                        const vw = window.innerWidth || document.documentElement.clientWidth || 360;
+	                        const vh = window.innerHeight || document.documentElement.clientHeight || 640;
+	                        const margin = 8;
+	                        let left = ar.right - (pr?.width || 0);
+	                        let top = ar.bottom + 6;
+	                        if (left < margin) left = margin;
+	                        if (left + (pr?.width || 0) > (vw - margin)) left = Math.max(margin, vw - (pr?.width || 0) - margin);
+	                        if (top + (pr?.height || 0) > (vh - margin)) top = Math.max(margin, ar.top - (pr?.height || 0) - 6);
+	                        try {
+	                            roleMorePopupEl.style.left = `${Math.round(left)}px`;
+	                            roleMorePopupEl.style.top = `${Math.round(top)}px`;
+	                        } catch { }
+	                    };
+	                    place();
+	                    roleMorePopupResizeHandler = () => place();
+	                    try { window.addEventListener("resize", roleMorePopupResizeHandler, true); } catch { }
+	                    try { window.addEventListener("scroll", roleMorePopupResizeHandler, true); } catch { }
+	                    roleMorePopupDocHandler = (ev) => {
+	                        const t = ev?.target;
+	                        if (!t) return;
+	                        if (roleMorePopupEl?.contains?.(t)) return;
+	                        if (roleMorePopupAnchor?.contains?.(t)) return;
+	                        closeRoleMorePopup();
+	                    };
+	                    try { document.addEventListener("pointerdown", roleMorePopupDocHandler, true); } catch { }
+	                };
 	                const removeRoleMoreBadge = (authorInfo) => {
 	                    const more = getRoleMoreBadge(authorInfo);
 	                    if (!more) return;
+	                    if (roleMorePopupAnchor === more) closeRoleMorePopup();
 	                    try { more.remove(); } catch { }
 	                };
 	                const restoreRoleBadgeVisibility = (tag) => {
@@ -722,16 +798,12 @@
 	                        try { ev.preventDefault(); } catch { }
 	                        try { ev.stopPropagation(); } catch { }
 	                        try { ev.stopImmediatePropagation?.(); } catch { }
-	                        const hidden = collectRoleBadges(authorInfo).filter((tag) => String(tag?.dataset?.nsxRoleHiddenByMore || "0") === "1");
-	                        if (!hidden.length) return;
-	                        hidden.forEach((tag) => restoreRoleBadgeVisibility(tag));
-	                        removeRoleMoreBadge(authorInfo);
-	                        try { clearTimeout(authorInfo.__nsxRoleMoreTimer); } catch { }
-	                        authorInfo.__nsxRoleMoreTimer = setTimeout(() => {
-	                            if (!authorInfo?.isConnected) return;
-	                            const shouldCompact = authorInfo.classList?.contains?.("nsx-author-tight");
-	                            autoAbbrevRoleBadges(authorInfo, !!shouldCompact);
-	                        }, ROLE_BADGE_REVEAL_MS);
+	                        const hiddenLabels = collectRoleBadges(authorInfo)
+	                            .filter((tag) => String(tag?.dataset?.nsxRoleHiddenByMore || "0") === "1")
+	                            .map((tag) => getRoleBadgeRawText(tag))
+	                            .filter(Boolean);
+	                        if (!hiddenLabels.length) return;
+	                        openRoleMorePopup(more, hiddenLabels);
 	                    }, true);
 	                    try { authorInfo.appendChild(more); } catch { }
 	                    return more;
@@ -824,6 +896,7 @@
 	                };
 	                const autoAbbrevRoleBadges = (authorInfo, shouldCompact) => {
 	                    if (!authorInfo) return;
+	                    if (roleMorePopupAnchor && !authorInfo.contains(roleMorePopupAnchor)) closeRoleMorePopup();
 	                    restoreRoleBadgesToMainRow(authorInfo);
 	                    removeRoleMoreBadge(authorInfo);
 	                    const tags = collectRoleBadges(authorInfo);
