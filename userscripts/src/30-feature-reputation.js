@@ -1011,6 +1011,7 @@
 				                        try { authorInfo.classList.remove("nsx-author-tight"); } catch { }
 				                        try { authorInfo.classList.remove("nsx-author-nowrap"); } catch { }
 				                        try { floorTightHost?.classList?.remove?.("nsx-floor-tight"); } catch { }
+				                        try { floorTightHost?.classList?.remove?.("nsx-floor-tight-2"); } catch { }
 				                        autoAbbrevRoleBadges(authorInfo, false);
 				                    }
 				                    const scheduleAuthorNoWrapIfWrapped = () => {
@@ -1020,6 +1021,7 @@
 			                        const run = () => {
 			                            let wrapped = false;
 			                            let crowded = false;
+			                            let floorTightLevel = 0; // 0=不收缩, 1=轻度, 2=重度
 		                            try {
 		                                if (narrowScreen) authorInfo.classList.add("nsx-author-nowrap");
 		                                else authorInfo.classList.remove("nsx-author-nowrap");
@@ -1063,7 +1065,12 @@
 		                                            const rr = node.getBoundingClientRect?.();
 		                                            if (!rr || rr.width < 1 || rr.height < 1) continue;
 		                                            const overlapY = rr.bottom > (ar.top + 2) && rr.top < (ar.bottom - 2);
-		                                            if (overlapY && rr.left < (ar.right + 6)) { crowded = true; break; }
+		                                            if (overlapY && rr.left < (ar.right + 6)) {
+		                                                crowded = true;
+		                                                const intrusion = ar.right - rr.left;
+		                                                floorTightLevel = Math.max(floorTightLevel, intrusion > 2 ? 2 : 1);
+		                                                break;
+		                                            }
 		                                        }
 		                                    }
 		                                } catch { }
@@ -1072,7 +1079,9 @@
 		                            // 4) 内部内容总宽超出可用宽度（未必触发浏览器换行，但会造成视觉拥挤）
 			                            if (!wrapped && !crowded) {
 			                                try {
-			                                    crowded = (authorInfo.scrollWidth - authorInfo.clientWidth) > 4;
+			                                    const overflow = (authorInfo.scrollWidth - authorInfo.clientWidth);
+			                                    crowded = overflow > 4;
+			                                    if (crowded) floorTightLevel = Math.max(floorTightLevel, overflow > 14 ? 2 : 1);
 			                                } catch { }
 			                            }
 		                            // 5) 元素被 authorInfo 自身裁切（overflow hidden 场景）
@@ -1086,7 +1095,13 @@
 		                                            if (!node) continue;
 		                                            const rr = node.getBoundingClientRect?.();
 		                                            if (!rr || rr.width < 1 || rr.height < 1) continue;
-		                                            if (rr.right > (ar.right + 1) || rr.left < (ar.left - 1)) { crowded = true; break; }
+		                                            if (rr.right > (ar.right + 1) || rr.left < (ar.left - 1)) {
+		                                                crowded = true;
+		                                                const overflowRight = rr.right - ar.right;
+		                                                const overflowLeft = ar.left - rr.left;
+		                                                floorTightLevel = Math.max(floorTightLevel, (overflowRight > 8 || overflowLeft > 8) ? 2 : 1);
+		                                                break;
+		                                            }
 		                                        }
 		                                    }
 		                                } catch { }
@@ -1108,6 +1123,8 @@
 		                                        });
 		                                        if (Number.isFinite(nearestRightLeft) && nearestRightLeft < Infinity && ar.right > (nearestRightLeft - 6)) {
 		                                            crowded = true;
+		                                            const gap = nearestRightLeft - ar.right;
+		                                            floorTightLevel = Math.max(floorTightLevel, gap < 2 ? 2 : 1);
 		                                        }
 		                                    }
 		                                } catch { }
@@ -1120,19 +1137,27 @@
 		                                    const hasFusedFloor = !!metaHost?.querySelector?.(".floor-link-wrapper > a.nsx-floor-fused");
 		                                    if (narrowScreen && hasFusedFloor) {
 		                                        const roleCount = collectRoleBadges(authorInfo).length;
-		                                        if (roleCount >= 2) crowded = true;
+		                                        if (roleCount >= 2) {
+		                                            crowded = true;
+		                                            floorTightLevel = Math.max(floorTightLevel, roleCount >= 3 ? 2 : 1);
+		                                        }
 		                                    }
 		                                } catch { }
 		                            }
-				                            const shouldCompact = wrapped || crowded;
-				                            if (shouldCompact) {
-				                                try { if (username && !el.title) el.title = username; } catch { }
-				                                try { authorInfo.classList.add("nsx-author-tight"); } catch { }
-				                                try { floorTightHost?.classList?.add?.("nsx-floor-tight"); } catch { }
-				                            } else {
-				                                try { authorInfo.classList.remove("nsx-author-tight"); } catch { }
-				                                try { floorTightHost?.classList?.remove?.("nsx-floor-tight"); } catch { }
-				                            }
+					                            const shouldCompact = wrapped || crowded;
+					                            if (shouldCompact) {
+					                                try { if (username && !el.title) el.title = username; } catch { }
+					                                try { authorInfo.classList.add("nsx-author-tight"); } catch { }
+					                                try { floorTightHost?.classList?.add?.("nsx-floor-tight"); } catch { }
+					                                try {
+					                                    if ((floorTightLevel || 0) >= 2) floorTightHost?.classList?.add?.("nsx-floor-tight-2");
+					                                    else floorTightHost?.classList?.remove?.("nsx-floor-tight-2");
+					                                } catch { }
+					                            } else {
+					                                try { authorInfo.classList.remove("nsx-author-tight"); } catch { }
+					                                try { floorTightHost?.classList?.remove?.("nsx-floor-tight"); } catch { }
+					                                try { floorTightHost?.classList?.remove?.("nsx-floor-tight-2"); } catch { }
+					                            }
 				                            autoAbbrevRoleBadges(authorInfo, shouldCompact);
 				                        };
 		                        try {
