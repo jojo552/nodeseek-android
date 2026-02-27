@@ -1974,8 +1974,13 @@ body.dark-layout .nsx-sheet-item[data-a="filter"] .nsx-sheet-item-icon,html.dark
 		                const seen = new Set();
 		                const push = (el, type) => {
 		                    if (!el || el.nodeType !== 1) return;
-		                    // 角标检测仅针对“楼层容器外部”的原始角标，避免把融合后的楼层链接本体误判为角标
-		                    if (el.closest?.(".floor-link-wrapper")) return;
+		                    // 仅排除“楼层号链接本体”及其内部节点，避免把融合后的楼层号再次误判成角标。
+		                    // floor-link-wrapper 中的原始 HOT/置顶角标仍需保留参与融合识别。
+		                    const floorWrap = el.closest?.(".floor-link-wrapper");
+		                    if (floorWrap) {
+		                        const floorLink = floorWrap.querySelector?.("a.floor-link,a[href^=\"#\"]");
+		                        if (floorLink && (el === floorLink || floorLink.contains?.(el))) return;
+		                    }
 		                    if (seen.has(el)) return;
 		                    if (type !== "hot" && type !== "pin") return;
 		                    seen.add(el);
