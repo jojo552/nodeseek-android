@@ -1939,9 +1939,6 @@ body.dark-layout .nsx-sheet-item[data-a="filter"] .nsx-sheet-item-icon,html.dark
 			                    background:linear-gradient(180deg,rgba(55,48,163,.34),rgba(76,29,149,.24))!important;
 			                    color:#ddd6fe!important
 			                }
-			                .nsk-content-meta-info[data-nsx-floor-fused="1"] .floor-link-wrapper .hot-badge,
-			                .nsk-content-meta-info[data-nsx-floor-fused="1"] .floor-link-wrapper .pin-badge,
-			                .nsk-content-meta-info[data-nsx-floor-fused="1"] .floor-link-wrapper .pined-comment-badge,
 			                .nsk-content-meta-info[data-nsx-floor-fused="1"] .floor-link-wrapper [data-nsx-corner-hidden-by-fused="1"]{
 			                    display:none!important;
 			                    visibility:hidden!important
