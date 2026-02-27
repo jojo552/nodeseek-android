@@ -1002,6 +1002,7 @@
 				                    if (!narrowScreen && authorInfo) {
 				                        try { authorInfo.classList.remove("nsx-author-tight"); } catch { }
 				                        try { authorInfo.classList.remove("nsx-author-nowrap"); } catch { }
+				                        try { metaInfo.classList.remove("nsx-floor-tight"); } catch { }
 				                        autoAbbrevRoleBadges(authorInfo, false);
 				                    }
 				                    const scheduleAuthorNoWrapIfWrapped = () => {
@@ -1119,8 +1120,10 @@
 				                            if (shouldCompact) {
 				                                try { if (username && !el.title) el.title = username; } catch { }
 				                                try { authorInfo.classList.add("nsx-author-tight"); } catch { }
+				                                try { metaInfo.classList.add("nsx-floor-tight"); } catch { }
 				                            } else {
 				                                try { authorInfo.classList.remove("nsx-author-tight"); } catch { }
+				                                try { metaInfo.classList.remove("nsx-floor-tight"); } catch { }
 				                            }
 				                            autoAbbrevRoleBadges(authorInfo, shouldCompact);
 				                        };
