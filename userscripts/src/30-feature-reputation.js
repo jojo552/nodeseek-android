@@ -1027,6 +1027,17 @@
 				                                else wrap.classList.remove("nsx-floor-tight");
 				                                if (lv >= 2) wrap.classList.add("nsx-floor-tight-2");
 				                                else wrap.classList.remove("nsx-floor-tight-2");
+				                                wrap.querySelectorAll?.("a.nsx-floor-fused,a.floor-link,a[href^=\"#\"]")?.forEach?.((link) => {
+				                                    if (!link) return;
+				                                    const txt = String(link.textContent || "").trim();
+				                                    if (!link.dataset?.nsxFloorRawText && txt) {
+				                                        try { link.dataset.nsxFloorRawText = txt; } catch { }
+				                                    }
+				                                    const raw = String(link.dataset?.nsxFloorRawText || txt || "").trim();
+				                                    if (!raw) return;
+				                                    const nextText = lv >= 2 ? raw.replace(/^#\s*/, "") : raw;
+				                                    if (String(link.textContent || "").trim() !== nextText) link.textContent = nextText;
+				                                });
 				                            } catch { }
 				                        });
 				                    };
