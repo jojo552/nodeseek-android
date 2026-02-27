@@ -882,8 +882,33 @@
 	                    try { narrowScreen = !!isSmallScreen?.(768); } catch { narrowScreen = false; }
 	                    const needLimit = !!(shouldCompact || crowdedNow || narrowScreen);
 	                    if (!needLimit) return;
-	                    const visible = tags.slice(0, ROLE_BADGE_MAX_VISIBLE);
-	                    const hidden = tags.slice(ROLE_BADGE_MAX_VISIBLE);
+	                    const getPriorityIndex = (tag) => {
+	                        if (!tag) return ROLE_BADGE_PRIORITY.length + 99;
+	                        for (let i = 0; i < ROLE_BADGE_PRIORITY.length; i += 1) {
+	                            if (tag.classList?.contains?.(ROLE_BADGE_PRIORITY[i])) return i;
+	                        }
+	                        return ROLE_BADGE_PRIORITY.length + 1;
+	                    };
+	                    const getStableLen = (tag) => {
+	                        const t = String(getRoleBadgeStableText(tag) || "").replace(/\s+/g, "");
+	                        return Array.from(t).length || 99;
+	                    };
+	                    // 拥挤态优先展示“字少”的标签，长度相同再按角色优先级。
+	                    const compactOrdered = [...tags].sort((a, b) => {
+	                        const la = getStableLen(a);
+	                        const lb = getStableLen(b);
+	                        if (la !== lb) return la - lb;
+	                        const pa = getPriorityIndex(a);
+	                        const pb = getPriorityIndex(b);
+	                        if (pa !== pb) return pa - pb;
+	                        return 0;
+	                    });
+	                    const isOpTag = (tag) => !!(tag?.classList?.contains?.("nsx-op-badge") || /楼主|^op$/i.test(getRoleBadgeRawText(tag)));
+	                    const forced = compactOrdered.filter((tag) => isOpTag(tag)).slice(0, 1);
+	                    const rest = compactOrdered.filter((tag) => !forced.includes(tag));
+	                    const slots = Math.max(0, ROLE_BADGE_MAX_VISIBLE - forced.length);
+	                    const visible = [...forced, ...rest.slice(0, slots)];
+	                    const hidden = compactOrdered.filter((tag) => !visible.includes(tag));
 	                    hidden.forEach((tag) => hideRoleBadgeByLimit(tag));
 	                    if (!hidden.length) return;
 	                    const more = ensureRoleMoreBadge(authorInfo);
@@ -891,9 +916,7 @@
 	                    const tip = hidden.map((tag) => getRoleBadgeRawText(tag)).filter(Boolean).join(" / ");
 	                    more.textContent = `+${hidden.length}`;
 	                    if (tip) more.title = `隐藏标签：${tip}`;
-	                    // 拥挤场景把 +N 往左放，避免被右侧楼层区遮挡
-	                    const preferLeft = !!(shouldCompact || crowdedNow || narrowScreen);
-	                    const anchor = preferLeft ? (visible[0] || visible[visible.length - 1] || tags[0]) : (visible[visible.length - 1] || visible[0] || tags[0]);
+	                    const anchor = visible[visible.length - 1] || visible[0] || tags[0];
 	                    try { anchor?.insertAdjacentElement?.("afterend", more); } catch { }
 	                };
 	                const autoAbbrevRoleBadges = (authorInfo, shouldCompact) => {
