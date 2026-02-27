@@ -1007,11 +1007,33 @@
 				                        } catch { }
 				                        return metaInfo || null;
 				                    })();
+				                    const getFloorWrappers = () => {
+				                        const set = new Set();
+				                        try { floorTightHost?.querySelectorAll?.(".floor-link-wrapper")?.forEach?.(n => n && set.add(n)); } catch { }
+				                        try { authorInfo?.parentElement?.querySelectorAll?.(".floor-link-wrapper")?.forEach?.(n => n && set.add(n)); } catch { }
+				                        return Array.from(set);
+				                    };
+				                    const setFloorTightState = (level) => {
+				                        const lv = Math.max(0, Math.min(2, Number(level) || 0));
+				                        try {
+				                            if (lv > 0) floorTightHost?.classList?.add?.("nsx-floor-tight");
+				                            else floorTightHost?.classList?.remove?.("nsx-floor-tight");
+				                            if (lv >= 2) floorTightHost?.classList?.add?.("nsx-floor-tight-2");
+				                            else floorTightHost?.classList?.remove?.("nsx-floor-tight-2");
+				                        } catch { }
+				                        getFloorWrappers().forEach((wrap) => {
+				                            try {
+				                                if (lv > 0) wrap.classList.add("nsx-floor-tight");
+				                                else wrap.classList.remove("nsx-floor-tight");
+				                                if (lv >= 2) wrap.classList.add("nsx-floor-tight-2");
+				                                else wrap.classList.remove("nsx-floor-tight-2");
+				                            } catch { }
+				                        });
+				                    };
 				                    if (!narrowScreen && authorInfo) {
 				                        try { authorInfo.classList.remove("nsx-author-tight"); } catch { }
 				                        try { authorInfo.classList.remove("nsx-author-nowrap"); } catch { }
-				                        try { floorTightHost?.classList?.remove?.("nsx-floor-tight"); } catch { }
-				                        try { floorTightHost?.classList?.remove?.("nsx-floor-tight-2"); } catch { }
+				                        setFloorTightState(0);
 				                        autoAbbrevRoleBadges(authorInfo, false);
 				                    }
 				                    const scheduleAuthorNoWrapIfWrapped = () => {
@@ -1148,15 +1170,10 @@
 					                            if (shouldCompact) {
 					                                try { if (username && !el.title) el.title = username; } catch { }
 					                                try { authorInfo.classList.add("nsx-author-tight"); } catch { }
-					                                try { floorTightHost?.classList?.add?.("nsx-floor-tight"); } catch { }
-					                                try {
-					                                    if ((floorTightLevel || 0) >= 2) floorTightHost?.classList?.add?.("nsx-floor-tight-2");
-					                                    else floorTightHost?.classList?.remove?.("nsx-floor-tight-2");
-					                                } catch { }
+					                                setFloorTightState((floorTightLevel || 0) >= 2 ? 2 : 1);
 					                            } else {
 					                                try { authorInfo.classList.remove("nsx-author-tight"); } catch { }
-					                                try { floorTightHost?.classList?.remove?.("nsx-floor-tight"); } catch { }
-					                                try { floorTightHost?.classList?.remove?.("nsx-floor-tight-2"); } catch { }
+					                                setFloorTightState(0);
 					                            }
 				                            autoAbbrevRoleBadges(authorInfo, shouldCompact);
 				                        };

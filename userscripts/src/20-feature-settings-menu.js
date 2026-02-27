@@ -1939,15 +1939,15 @@ body.dark-layout .nsx-sheet-item[data-a="filter"] .nsx-sheet-item-icon,html.dark
 			                    background:linear-gradient(180deg,rgba(55,48,163,.34),rgba(76,29,149,.24))!important;
 			                    color:#ddd6fe!important
 			                }
-			                .nsk-content-meta-info.nsx-floor-tight .floor-link-wrapper,.nsx-floor-tight .floor-link-wrapper{gap:1px!important}
-			                .nsk-content-meta-info.nsx-floor-tight .floor-link-wrapper > a.nsx-floor-fused,.nsx-floor-tight .floor-link-wrapper > a.nsx-floor-fused{
+			                .nsk-content-meta-info.nsx-floor-tight .floor-link-wrapper,.nsx-floor-tight .floor-link-wrapper,.floor-link-wrapper.nsx-floor-tight{gap:1px!important}
+			                .nsk-content-meta-info.nsx-floor-tight .floor-link-wrapper > a.nsx-floor-fused,.nsx-floor-tight .floor-link-wrapper > a.nsx-floor-fused,.floor-link-wrapper.nsx-floor-tight > a.nsx-floor-fused{
 			                    padding:0 2px!important;
 			                    border-radius:9px!important;
 			                    font-size:12px!important;
 			                    box-shadow:none!important
 			                }
-			                .nsk-content-meta-info.nsx-floor-tight.nsx-floor-tight-2 .floor-link-wrapper,.nsx-floor-tight.nsx-floor-tight-2 .floor-link-wrapper{gap:0!important}
-			                .nsk-content-meta-info.nsx-floor-tight.nsx-floor-tight-2 .floor-link-wrapper > a.nsx-floor-fused,.nsx-floor-tight.nsx-floor-tight-2 .floor-link-wrapper > a.nsx-floor-fused{
+			                .nsk-content-meta-info.nsx-floor-tight.nsx-floor-tight-2 .floor-link-wrapper,.nsx-floor-tight.nsx-floor-tight-2 .floor-link-wrapper,.floor-link-wrapper.nsx-floor-tight.nsx-floor-tight-2{gap:0!important}
+			                .nsk-content-meta-info.nsx-floor-tight.nsx-floor-tight-2 .floor-link-wrapper > a.nsx-floor-fused,.nsx-floor-tight.nsx-floor-tight-2 .floor-link-wrapper > a.nsx-floor-fused,.floor-link-wrapper.nsx-floor-tight.nsx-floor-tight-2 > a.nsx-floor-fused{
 			                    padding:0 1px!important;
 			                    border-radius:7px!important;
 			                    font-size:10.5px!important;
@@ -1955,7 +1955,8 @@ body.dark-layout .nsx-sheet-item[data-a="filter"] .nsx-sheet-item-icon,html.dark
 			                }
 			                /* 紧凑态下隐藏右上角火焰/图钉，避免与身份胶囊争夺视觉与空间 */
 			                .nsk-content-meta-info.nsx-floor-tight .floor-link-wrapper > a.nsx-floor-fused-hot::after,.nsk-content-meta-info.nsx-floor-tight .floor-link-wrapper > a.nsx-floor-fused-pin::after,.nsk-content-meta-info.nsx-floor-tight .floor-link-wrapper > a.nsx-floor-fused-both::before,.nsk-content-meta-info.nsx-floor-tight .floor-link-wrapper > a.nsx-floor-fused-both::after,
-			                .nsx-floor-tight .floor-link-wrapper > a.nsx-floor-fused-hot::after,.nsx-floor-tight .floor-link-wrapper > a.nsx-floor-fused-pin::after,.nsx-floor-tight .floor-link-wrapper > a.nsx-floor-fused-both::before,.nsx-floor-tight .floor-link-wrapper > a.nsx-floor-fused-both::after{
+			                .nsx-floor-tight .floor-link-wrapper > a.nsx-floor-fused-hot::after,.nsx-floor-tight .floor-link-wrapper > a.nsx-floor-fused-pin::after,.nsx-floor-tight .floor-link-wrapper > a.nsx-floor-fused-both::before,.nsx-floor-tight .floor-link-wrapper > a.nsx-floor-fused-both::after,
+			                .floor-link-wrapper.nsx-floor-tight > a.nsx-floor-fused-hot::after,.floor-link-wrapper.nsx-floor-tight > a.nsx-floor-fused-pin::after,.floor-link-wrapper.nsx-floor-tight > a.nsx-floor-fused-both::before,.floor-link-wrapper.nsx-floor-tight > a.nsx-floor-fused-both::after{
 			                    content:""!important
 			                }
 			                @media (max-width:768px){
