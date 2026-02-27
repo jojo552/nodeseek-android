@@ -164,6 +164,8 @@
 		.nsx-broker-badge{border:1px solid rgba(217,119,6,.34)!important;background:linear-gradient(180deg,rgba(255,251,235,.98),rgba(254,243,199,.86))!important;color:#b45309!important}
 		.nsx-broker-badge::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;background:linear-gradient(180deg,#fbbf24 0%,#f59e0b 55%,#b45309 100%);opacity:.98}
 		body.dark-layout .nsx-broker-badge,html.dark .nsx-broker-badge{border-color:rgba(251,191,36,.42)!important;background:linear-gradient(180deg,rgba(120,53,15,.92),rgba(146,64,14,.82))!important;box-shadow:0 1px 4px rgba(0,0,0,.32)!important;color:#fde68a!important}
+		.nsx-role-more-badge{position:relative;display:inline-flex!important;align-items:center!important;justify-content:center!important;flex:0 0 auto!important;height:14px!important;line-height:14px!important;padding:0 5px!important;margin-left:5px!important;border-radius:999px!important;border:1px dashed rgba(148,163,184,.5)!important;background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(248,250,252,.9))!important;color:#475569!important;font-size:9px!important;font-weight:760!important;letter-spacing:0!important;cursor:pointer}
+		body.dark-layout .nsx-role-more-badge,html.dark .nsx-role-more-badge{border-color:rgba(148,163,184,.56)!important;background:linear-gradient(180deg,rgba(51,65,85,.88),rgba(30,41,59,.78))!important;color:#cbd5e1!important}
 		.nsx-mute-badge{display:inline-flex!important;align-items:center!important;justify-content:center!important;flex:0 0 auto!important;height:14px!important;line-height:14px!important;padding:0 5px!important;margin-left:5px!important;border-radius:999px!important;border:1px solid #ffc1bb!important;background:#fff2f1!important;box-shadow:none!important;font-size:9.5px!important;font-weight:760!important;letter-spacing:0!important;color:#cf1322!important}
 		.nsx-mute-badge.nsx-mute-badge-secondary{height:13px!important;line-height:13px!important;padding:0 4px!important;margin:0 6px 0 0!important;font-size:9px!important;vertical-align:middle!important;opacity:.95}
 		.nsk-content-meta-info time + .nsx-mute-badge.nsx-mute-badge-secondary{margin-left:6px!important}
@@ -187,6 +189,8 @@
 		/* 作者行拥挤时：不换行下沉，改为单行逐级紧凑与自动缩写 */
 		.nsk-content-meta-info .author-info.nsx-role-abbrev-1 .nsx-op-badge,.nsk-content-meta-info .author-info.nsx-role-abbrev-1 .nsx-blogger-badge,.nsk-content-meta-info .author-info.nsx-role-abbrev-1 .nsx-owner-badge,.nsk-content-meta-info .author-info.nsx-role-abbrev-1 .nsx-oneman-badge,.nsk-content-meta-info .author-info.nsx-role-abbrev-1 .nsx-admin-badge,.nsk-content-meta-info .author-info.nsx-role-abbrev-1 .nsx-dev-badge,.nsk-content-meta-info .author-info.nsx-role-abbrev-1 .nsx-detective-badge,.nsk-content-meta-info .author-info.nsx-role-abbrev-1 .nsx-broker-badge{font-size:9px!important;padding:0 4px 0 6px!important;margin-left:3px!important}
 		.nsk-content-meta-info .author-info.nsx-role-abbrev-2 .nsx-op-badge,.nsk-content-meta-info .author-info.nsx-role-abbrev-2 .nsx-blogger-badge,.nsk-content-meta-info .author-info.nsx-role-abbrev-2 .nsx-owner-badge,.nsk-content-meta-info .author-info.nsx-role-abbrev-2 .nsx-oneman-badge,.nsk-content-meta-info .author-info.nsx-role-abbrev-2 .nsx-admin-badge,.nsk-content-meta-info .author-info.nsx-role-abbrev-2 .nsx-dev-badge,.nsk-content-meta-info .author-info.nsx-role-abbrev-2 .nsx-detective-badge,.nsk-content-meta-info .author-info.nsx-role-abbrev-2 .nsx-broker-badge{font-size:8.6px!important;padding:0 3px 0 5px!important;margin-left:2px!important;letter-spacing:0!important}
+		.nsk-content-meta-info .author-info.nsx-role-abbrev-1 .nsx-role-more-badge{font-size:9px!important;padding:0 4px!important;margin-left:3px!important}
+		.nsk-content-meta-info .author-info.nsx-role-abbrev-2 .nsx-role-more-badge{font-size:8.6px!important;padding:0 3px!important;margin-left:2px!important}
 		.nsk-content-meta-info .author-info .nsx-badge-abbrev{cursor:pointer}
 		@media (max-width:768px){
 		.nsk-content-meta-info .author-info.nsx-author-nowrap{display:flex;align-items:center;justify-content:flex-start;flex-wrap:nowrap;max-width:100%;min-width:0;overflow:hidden}
@@ -203,10 +207,13 @@
 		.nsk-content-meta-info .author-info.nsx-author-tight .nsx-user-id-sep{padding:0 2px!important}
 		.nsk-content-meta-info .author-info.nsx-author-tight .nsx-user-id-level{max-width:6.6em!important}
 		.nsk-content-meta-info .author-info.nsx-author-tight .nsx-op-badge,.nsk-content-meta-info .author-info.nsx-author-tight .nsx-blogger-badge,.nsk-content-meta-info .author-info.nsx-author-tight .nsx-owner-badge,.nsk-content-meta-info .author-info.nsx-author-tight .nsx-oneman-badge,.nsk-content-meta-info .author-info.nsx-author-tight .nsx-admin-badge,.nsk-content-meta-info .author-info.nsx-author-tight .nsx-dev-badge,.nsk-content-meta-info .author-info.nsx-author-tight .nsx-detective-badge,.nsk-content-meta-info .author-info.nsx-author-tight .nsx-broker-badge,.nsk-content-meta-info .author-info.nsx-author-tight .nsx-mute-badge{margin-left:3px!important}
+		.nsk-content-meta-info .author-info.nsx-author-tight .nsx-role-more-badge{margin-left:3px!important}
 		.nsx-op-badge,.nsx-blogger-badge,.nsx-owner-badge,.nsx-admin-badge,.nsx-dev-badge,.nsx-detective-badge,.nsx-broker-badge{height:13px!important;line-height:13px!important;font-size:9px!important;padding:0 4px 0 6px!important}
 		.nsx-oneman-badge{min-height:13px!important;height:auto!important;line-height:1.04!important;font-size:9px!important;padding:1px 4px 1px 6px!important}
+		.nsx-role-more-badge{height:13px!important;line-height:13px!important;font-size:9px!important;padding:0 4px!important}
 		.nsx-mute-badge{height:13px!important;line-height:13px!important;font-size:9px!important;padding:0 4px!important}
 		.nsk-content-meta-info .author-info.nsx-role-abbrev-2 .nsx-op-badge,.nsk-content-meta-info .author-info.nsx-role-abbrev-2 .nsx-blogger-badge,.nsk-content-meta-info .author-info.nsx-role-abbrev-2 .nsx-owner-badge,.nsk-content-meta-info .author-info.nsx-role-abbrev-2 .nsx-oneman-badge,.nsk-content-meta-info .author-info.nsx-role-abbrev-2 .nsx-admin-badge,.nsk-content-meta-info .author-info.nsx-role-abbrev-2 .nsx-dev-badge,.nsk-content-meta-info .author-info.nsx-role-abbrev-2 .nsx-detective-badge,.nsk-content-meta-info .author-info.nsx-role-abbrev-2 .nsx-broker-badge{font-size:8px!important;padding:0 3px 0 4px!important;margin-left:2px!important}
+		.nsk-content-meta-info .author-info.nsx-role-abbrev-2 .nsx-role-more-badge{font-size:8px!important;padding:0 3px!important;margin-left:2px!important}
 		}
 		`);
 
@@ -621,6 +628,7 @@
 	                const ROLE_BADGE_SELECTOR = ".nsx-op-badge,.nsx-blogger-badge,.nsx-owner-badge,.nsx-oneman-badge,.nsx-admin-badge,.nsx-dev-badge,.nsx-detective-badge,.nsx-broker-badge";
 	                const ROLE_BADGE_PRIORITY = ["nsx-oneman-badge", "nsx-detective-badge", "nsx-broker-badge", "nsx-dev-badge", "nsx-admin-badge", "nsx-owner-badge", "nsx-blogger-badge", "nsx-op-badge"];
 	                const ROLE_BADGE_REVEAL_MS = 1800;
+	                const ROLE_BADGE_MAX_VISIBLE = 2;
 	                const getRoleOverflowRow = (authorInfo) => {
 	                    const parent = authorInfo?.parentElement;
 	                    if (!parent) return null;
@@ -655,6 +663,78 @@
 	                        } catch { }
 	                    });
 	                    try { row.remove(); } catch { }
+	                };
+	                const getRoleMoreBadge = (authorInfo) => {
+	                    if (!authorInfo) return null;
+	                    try { return authorInfo.querySelector?.(".nsx-role-more-badge") || null; } catch { return null; }
+	                };
+	                const removeRoleMoreBadge = (authorInfo) => {
+	                    const more = getRoleMoreBadge(authorInfo);
+	                    if (!more) return;
+	                    try { more.remove(); } catch { }
+	                };
+	                const restoreRoleBadgeVisibility = (tag) => {
+	                    if (!tag || String(tag.dataset?.nsxRoleHiddenByMore || "0") !== "1") return;
+	                    try {
+	                        const display0 = String(tag.dataset?.nsxRoleDisplay0 || "");
+	                        const displayPriority0 = String(tag.dataset?.nsxRoleDisplayPriority0 || "");
+	                        if (display0) {
+	                            tag.style.setProperty("display", display0, displayPriority0 === "important" ? "important" : "");
+	                        } else {
+	                            tag.style.removeProperty("display");
+	                        }
+	                        delete tag.dataset.nsxRoleDisplay0;
+	                        delete tag.dataset.nsxRoleDisplayPriority0;
+	                        delete tag.dataset.nsxRoleHiddenByMore;
+	                    } catch { }
+	                };
+	                const hideRoleBadgeByLimit = (tag) => {
+	                    if (!tag) return;
+	                    try {
+	                        if (String(tag.dataset?.nsxRoleHiddenByMore || "0") !== "1") {
+	                            tag.dataset.nsxRoleDisplay0 = tag.style.getPropertyValue("display") || "";
+	                            tag.dataset.nsxRoleDisplayPriority0 = tag.style.getPropertyPriority("display") || "";
+	                        }
+	                        tag.style.setProperty("display", "none", "important");
+	                        tag.dataset.nsxRoleHiddenByMore = "1";
+	                    } catch { }
+	                };
+	                const orderRoleBadgesByPriority = (tags) => {
+	                    const ordered = [];
+	                    ROLE_BADGE_PRIORITY.forEach((cls) => {
+	                        tags.forEach((tag) => {
+	                            if (!ordered.includes(tag) && tag?.classList?.contains?.(cls)) ordered.push(tag);
+	                        });
+	                    });
+	                    tags.forEach((tag) => { if (!ordered.includes(tag)) ordered.push(tag); });
+	                    return ordered;
+	                };
+	                const ensureRoleMoreBadge = (authorInfo) => {
+	                    if (!authorInfo) return null;
+	                    let more = getRoleMoreBadge(authorInfo);
+	                    if (more) return more;
+	                    more = document.createElement("span");
+	                    more.className = "nsx-role-more-badge";
+	                    more.dataset.nsxRoleMore = "1";
+	                    more.textContent = "+0";
+	                    more.title = "点击临时展开全部标签";
+	                    more.addEventListener("click", (ev) => {
+	                        try { ev.preventDefault(); } catch { }
+	                        try { ev.stopPropagation(); } catch { }
+	                        try { ev.stopImmediatePropagation?.(); } catch { }
+	                        const hidden = collectRoleBadges(authorInfo).filter((tag) => String(tag?.dataset?.nsxRoleHiddenByMore || "0") === "1");
+	                        if (!hidden.length) return;
+	                        hidden.forEach((tag) => restoreRoleBadgeVisibility(tag));
+	                        removeRoleMoreBadge(authorInfo);
+	                        try { clearTimeout(authorInfo.__nsxRoleMoreTimer); } catch { }
+	                        authorInfo.__nsxRoleMoreTimer = setTimeout(() => {
+	                            if (!authorInfo?.isConnected) return;
+	                            const shouldCompact = authorInfo.classList?.contains?.("nsx-author-tight");
+	                            autoAbbrevRoleBadges(authorInfo, !!shouldCompact);
+	                        }, ROLE_BADGE_REVEAL_MS);
+	                    }, true);
+	                    try { authorInfo.appendChild(more); } catch { }
+	                    return more;
 	                };
 	                const getRoleBadgeRawText = (tag) => {
 	                    if (!tag) return "";
@@ -711,120 +791,60 @@
 	                        else if (tag.getAttribute?.("title") === raw) tag.removeAttribute("title");
 	                    } catch { }
 	                };
-	                const isRoleBadgeRevealLocked = (tag) => String(tag?.dataset?.nsxBadgeReveal || "0") === "1";
-	                const bindRoleBadgeReveal = (tag, authorInfo) => {
-	                    if (!tag || !authorInfo) return;
-	                    if (tag.dataset.nsxBadgeRevealBound === "1") return;
-	                    tag.dataset.nsxBadgeRevealBound = "1";
-	                    tag.addEventListener("click", (ev) => {
-	                        const raw = getRoleBadgeRawText(tag);
-	                        if (!raw) return;
-	                        const isRevealed = isRoleBadgeRevealLocked(tag);
-	                        const isAbbrev = String(tag.dataset.nsxBadgeAbbrev || "0") === "1";
-	                        if (!isRevealed && !isAbbrev) return;
-	                        try { ev.preventDefault(); } catch { }
-	                        try { ev.stopPropagation(); } catch { }
-	                        try { ev.stopImmediatePropagation?.(); } catch { }
-	                        if (isRevealed) {
-	                            tag.dataset.nsxBadgeReveal = "0";
-	                            const shouldCompact = authorInfo.classList?.contains?.("nsx-author-tight");
-	                            autoAbbrevRoleBadges(authorInfo, !!shouldCompact);
-	                            return;
-	                        }
-	                        tag.dataset.nsxBadgeReveal = "1";
-	                        setRoleBadgeText(tag, raw, true);
-	                        updateRoleBadgeAbbrevMark(tag);
-	                        try { clearTimeout(tag.__nsxBadgeRevealTimer); } catch { }
-	                        tag.__nsxBadgeRevealTimer = setTimeout(() => {
-	                            if (!tag.isConnected) return;
-	                            if (String(tag.dataset.nsxBadgeReveal || "0") !== "1") return;
-	                            tag.dataset.nsxBadgeReveal = "0";
-	                            const shouldCompact = authorInfo.classList?.contains?.("nsx-author-tight");
-	                            autoAbbrevRoleBadges(authorInfo, !!shouldCompact);
-	                        }, ROLE_BADGE_REVEAL_MS);
-	                    }, true);
-	                };
-	                const getRoleBadgeAbbrevText = (tag, level) => {
+	                const getRoleBadgeStableText = (tag) => {
 	                    const raw = getRoleBadgeRawText(tag);
 	                    const lower = raw.toLowerCase();
 	                    if (!raw) return "";
-	                    const iconOnly = level >= 2;
-	                    if (tag.classList?.contains?.("nsx-op-badge")) {
-	                        if (iconOnly) return "👤";
-	                        return raw;
-	                    }
-	                    if (tag.classList?.contains?.("nsx-oneman-badge") || /oneman/i.test(raw)) {
-	                        if (iconOnly) return "①";
-	                        return raw;
-	                    }
-	                    if (tag.classList?.contains?.("nsx-admin-badge") || /admin|mod|管理|版主/.test(lower) || /管理|版主/.test(raw)) {
-	                        if (iconOnly) return "🛡";
-	                        return raw;
-	                    }
-	                    if (tag.classList?.contains?.("nsx-owner-badge") || /owner|频道/.test(lower) || /频道/.test(raw)) {
-	                        if (iconOnly) return "📡";
-	                        return raw;
-	                    }
-	                    if (tag.classList?.contains?.("nsx-blogger-badge") || /博主/.test(raw)) {
-	                        if (iconOnly) return "✍";
-	                        return raw;
-	                    }
-	                    if (tag.classList?.contains?.("nsx-dev-badge") || /dev|开发/.test(lower) || /开发/.test(raw)) {
-	                        if (iconOnly) return "⚙";
-	                        return raw;
-	                    }
-	                    if (tag.classList?.contains?.("nsx-detective-badge") || /侦探/.test(raw) || /detective/.test(lower)) {
-	                        if (iconOnly) return "🔎";
-	                        return raw;
-	                    }
-	                    if (tag.classList?.contains?.("nsx-broker-badge") || /交易中介|中介/.test(raw) || /tradebroker|broker/.test(lower)) {
-	                        if (iconOnly) return "🤝";
-	                        return raw;
-	                    }
-	                    if (iconOnly) return "🏷";
+	                    if (tag.classList?.contains?.("nsx-broker-badge") || /交易中介|中介/.test(raw) || /tradebroker|broker/.test(lower)) return "中介";
+	                    if (tag.classList?.contains?.("nsx-admin-badge") && /管理员|版主/.test(raw)) return "管理";
+	                    if (tag.classList?.contains?.("nsx-owner-badge") && /频道管理|频道管理员/.test(raw)) return "频道主";
 	                    return raw;
+	                };
+	                const applyRoleBadgeCountLimit = (authorInfo, orderedTags, shouldCompact, crowdedNow) => {
+	                    if (!authorInfo) return;
+	                    const tags = Array.isArray(orderedTags) ? orderedTags.filter(Boolean) : [];
+	                    tags.forEach((tag) => restoreRoleBadgeVisibility(tag));
+	                    removeRoleMoreBadge(authorInfo);
+	                    if (tags.length <= ROLE_BADGE_MAX_VISIBLE) return;
+	                    let narrowScreen = false;
+	                    try { narrowScreen = !!isSmallScreen?.(768); } catch { narrowScreen = false; }
+	                    const needLimit = !!(shouldCompact || crowdedNow || narrowScreen);
+	                    if (!needLimit) return;
+	                    const visible = tags.slice(0, ROLE_BADGE_MAX_VISIBLE);
+	                    const hidden = tags.slice(ROLE_BADGE_MAX_VISIBLE);
+	                    hidden.forEach((tag) => hideRoleBadgeByLimit(tag));
+	                    if (!hidden.length) return;
+	                    const more = ensureRoleMoreBadge(authorInfo);
+	                    if (!more) return;
+	                    const tip = hidden.map((tag) => getRoleBadgeRawText(tag)).filter(Boolean).join(" / ");
+	                    more.textContent = `+${hidden.length}`;
+	                    if (tip) more.title = `隐藏标签：${tip}`;
+	                    const anchor = visible[visible.length - 1] || visible[0] || tags[0];
+	                    try { anchor?.insertAdjacentElement?.("afterend", more); } catch { }
 	                };
 	                const autoAbbrevRoleBadges = (authorInfo, shouldCompact) => {
 	                    if (!authorInfo) return;
 	                    restoreRoleBadgesToMainRow(authorInfo);
+	                    removeRoleMoreBadge(authorInfo);
 	                    const tags = collectRoleBadges(authorInfo);
 	                    if (!tags.length) return;
 	                    const clearClasses = () => {
 	                        try { authorInfo.classList.remove("nsx-role-abbrev-1", "nsx-role-abbrev-2"); } catch { }
 	                    };
-	                    tags.forEach((tag) => bindRoleBadgeReveal(tag, authorInfo));
 	                    const resetText = () => tags.forEach((tag) => {
-	                        if (isRoleBadgeRevealLocked(tag)) return;
-	                        setRoleBadgeText(tag, getRoleBadgeAbbrevText(tag, 0), true);
+	                        restoreRoleBadgeVisibility(tag);
+	                        setRoleBadgeText(tag, getRoleBadgeStableText(tag), true);
 	                        updateRoleBadgeAbbrevMark(tag);
 	                    });
 	                    const isCrowded = () => {
 	                        try { return (authorInfo.scrollWidth - authorInfo.clientWidth) > 4; } catch { return false; }
 	                    };
+	                    const ordered = orderRoleBadgesByPriority(tags);
 	                    clearClasses();
 	                    resetText();
-	                    if (!shouldCompact) return;
-	                    const ordered = [];
-	                    ROLE_BADGE_PRIORITY.forEach((cls) => {
-	                        tags.forEach((tag) => {
-	                            if (!ordered.includes(tag) && tag?.classList?.contains?.(cls)) ordered.push(tag);
-	                        });
-	                    });
-	                    tags.forEach((tag) => { if (!ordered.includes(tag)) ordered.push(tag); });
-	                    try { authorInfo.classList.add("nsx-role-abbrev-1"); } catch { }
-	                    // 进入紧凑模式后，至少执行一级文本缩写，避免“看起来未触发”
-	                    ordered.forEach((tag) => {
-	                        if (isRoleBadgeRevealLocked(tag)) return;
-	                        setRoleBadgeText(tag, getRoleBadgeAbbrevText(tag, 2));
-	                        updateRoleBadgeAbbrevMark(tag);
-	                    });
-	                    if (!isCrowded()) return;
-	                    try { authorInfo.classList.add("nsx-role-abbrev-2"); } catch { }
-	                    ordered.forEach((tag) => {
-	                        if (isRoleBadgeRevealLocked(tag)) return;
-	                        setRoleBadgeText(tag, getRoleBadgeAbbrevText(tag, 3));
-	                        updateRoleBadgeAbbrevMark(tag);
-	                    });
+	                    let crowdedNow = isCrowded();
+	                    if (shouldCompact) crowdedNow = true;
+	                    applyRoleBadgeCountLimit(authorInfo, ordered, shouldCompact, crowdedNow);
 	                };
 
 	                const getUserInfo = async (uid) => {
