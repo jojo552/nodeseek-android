@@ -1,6 +1,7 @@
 package com.nodeseek.app;
 
 import android.app.Activity;
+import android.annotation.SuppressLint;
 import android.content.ClipData;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -13,7 +14,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.window.OnBackInvokedCallback;
@@ -155,18 +155,14 @@ public class MainActivity extends Activity {
     private void setupWebView() {
         CookieManager cookieManager = CookieManager.getInstance();
         cookieManager.setAcceptCookie(true);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            cookieManager.setAcceptThirdPartyCookies(webContent, true);
-        }
+        cookieManager.setAcceptThirdPartyCookies(webContent, true);
 
         WebSettings settings = webContent.getSettings();
         settings.setJavaScriptEnabled(true);
         settings.setDomStorageEnabled(true);
         settings.setUseWideViewPort(true);
         settings.setLoadWithOverviewMode(true);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
-        }
+        settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
         NodeseekUserscriptRuntime.attach(this, webContent);
 
         webContent.setWebViewClient(new WebViewClient() {
@@ -957,17 +953,9 @@ public class MainActivity extends Activity {
 
     @Override
     @SuppressWarnings("deprecation")
+    @SuppressLint("GestureBackNavigation")
     public void onBackPressed() {
         handleBackNavigation();
-    }
-
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            handleBackNavigation();
-            return true;
-        }
-        return super.onKeyDown(keyCode, event);
     }
 
     private void handleBackNavigation() {
