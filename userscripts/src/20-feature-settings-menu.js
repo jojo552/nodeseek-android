@@ -1983,6 +1983,90 @@ body.dark-layout .nsx-sheet-item[data-a="filter"] .nsx-sheet-item-icon,html.dark
 		                return badges;
 		            };
 
+		            const getFloorLinkInHost = (host) => {
+		                if (!host || host.nodeType !== 1) return null;
+		                const wrap = host.querySelector?.(".floor-link-wrapper");
+		                if (!wrap) return null;
+		                let link = wrap.querySelector?.("a.floor-link,a[href^=\"#\"]");
+		                if (link) return link;
+		                try {
+		                    const links = Array.from(wrap.querySelectorAll?.("a[href]") || []);
+		                    link = links.find((a) => {
+		                        const href = String(a.getAttribute?.("href") || "").trim();
+		                        const txt = String(a.textContent || "").trim();
+		                        if (/^#\d+$/.test(txt)) return true;
+		                        if (/^#\d*$/.test(href)) return true;
+		                        return false;
+		                    }) || null;
+		                } catch { link = null; }
+		                return link;
+		            };
+
+		            const restoreFloorLinkInHost = (host) => {
+		                const link = getFloorLinkInHost(host);
+		                if (!link) return;
+		                try {
+		                    if (link.dataset?.nsxFloorDisplay0 !== undefined) {
+		                        link.style.display = link.dataset.nsxFloorDisplay0 || "";
+		                        delete link.dataset.nsxFloorDisplay0;
+		                    } else if (link.style.display === "none") {
+		                        link.style.display = "";
+		                    }
+		                } catch { }
+		                try { host.classList.remove("nsx-floor-link-hidden"); } catch { }
+		            };
+
+		            const countRoleTagsInHost = (host) => {
+		                if (!host || host.nodeType !== 1) return 0;
+		                let count = 0;
+		                try {
+		                    count += host.querySelectorAll?.(".nsx-op-badge,.nsx-blogger-badge,.nsx-owner-badge,.nsx-oneman-badge,.nsx-admin-badge,.nsx-dev-badge,.nsx-detective-badge,.nsx-broker-badge,.nsx-mute-badge")?.length || 0;
+		                } catch { }
+		                if (count > 0) return count;
+		                // 兜底：在未注入 nsx 角色徽章前，按作者行短标签文本粗略计数
+		                try {
+		                    const authorInfo = host.querySelector?.(".author-info");
+		                    if (!authorInfo) return 0;
+		                    const kw = /^(楼主|OP|op|博主|频道主|频道管理|频道管理员|oneman|OneMan|管理|管理员|版主|dev|DEV|开发|开发者|侦探|探员|交易中介|中介|禁言|临时禁言)$/i;
+		                    Array.from(authorInfo.children || []).forEach((node) => {
+		                        if (!node || node.nodeType !== 1) return;
+		                        const t = String(node.textContent || "").replace(/\s+/g, "").trim();
+		                        if (kw.test(t)) count += 1;
+		                    });
+		                } catch { }
+		                return count;
+		            };
+
+		            const applyFloorLinkCrowdingPolicy = (host, cornerCount = 0) => {
+		                if (!host || host.nodeType !== 1) return;
+		                const link = getFloorLinkInHost(host);
+		                if (!link) return;
+		                const roleCount = countRoleTagsInHost(host);
+		                const totalTags = Math.max(0, Number(cornerCount) || 0) + roleCount;
+		                let crowded = false;
+		                try { crowded = (host.scrollWidth - host.clientWidth) > 2; } catch { }
+
+		                // 标签较多时直接隐藏楼层号；轻度场景保持显示
+		                const shouldHide = totalTags >= 3 || (crowded && totalTags >= 2);
+		                try {
+		                    if (shouldHide) {
+		                        if (link.dataset?.nsxFloorDisplay0 === undefined) {
+		                            link.dataset.nsxFloorDisplay0 = link.style.display || "";
+		                        }
+		                        link.style.display = "none";
+		                        host.classList.add("nsx-floor-link-hidden");
+		                        return;
+		                    }
+		                    if (link.dataset?.nsxFloorDisplay0 !== undefined) {
+		                        link.style.display = link.dataset.nsxFloorDisplay0 || "";
+		                        delete link.dataset.nsxFloorDisplay0;
+		                    } else if (link.style.display === "none") {
+		                        link.style.display = "";
+		                    }
+		                    host.classList.remove("nsx-floor-link-hidden");
+		                } catch { }
+		            };
+
 		            const applyCornerBadgeSafePadding = (host) => {
 		                if (!host || host.nodeType !== 1) return;
 
@@ -1994,6 +2078,7 @@ body.dark-layout .nsx-sheet-item[data-a="filter"] .nsx-sheet-item-icon,html.dark
 		                        try { delete host.dataset.nsxCornerPadR0; } catch { }
 		                    }
 		                    try { host.classList.remove("nsx-has-corner-badge"); } catch { }
+		                    restoreFloorLinkInHost(host);
 		                    return;
 		                }
 
@@ -2004,6 +2089,8 @@ body.dark-layout .nsx-sheet-item[data-a="filter"] .nsx-sheet-item-icon,html.dark
 		                        try { delete host.dataset.nsxCornerPadR0; } catch { }
 		                    }
 		                    try { host.classList.remove("nsx-has-corner-badge"); } catch { }
+		                    try { applyFloorLinkCrowdingPolicy(host, 0); } catch { }
+		                    try { setTimeout(() => { try { applyFloorLinkCrowdingPolicy(host, 0); } catch { } }, 120); } catch { }
 		                    return;
 		                }
 
@@ -2036,7 +2123,10 @@ body.dark-layout .nsx-sheet-item[data-a="filter"] .nsx-sheet-item-icon,html.dark
 		                            if (w > maxW) maxW = w;
 		                            if (r && Number.isFinite(r.left) && r.left < minLeft) minLeft = r.left;
 		                        });
-		                        if (!(maxW > 0)) return;
+		                        if (!(maxW > 0)) {
+		                            applyFloorLinkCrowdingPolicy(host, found.length);
+		                            return;
+		                        }
 
 		                        const cs = getComputedStyle(host);
 		                        const base = parseFloat(cs?.paddingRight || "0") || 0;
@@ -2052,6 +2142,7 @@ body.dark-layout .nsx-sheet-item[data-a="filter"] .nsx-sheet-item-icon,html.dark
 		                        }
 		                        host.style.paddingRight = `${next}px`;
 		                        host.classList.add("nsx-has-corner-badge");
+		                        applyFloorLinkCrowdingPolicy(host, found.length);
 		                    } catch { }
 		                };
 
