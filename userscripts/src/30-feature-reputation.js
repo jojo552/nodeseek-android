@@ -744,49 +744,44 @@
 	                        }, ROLE_BADGE_REVEAL_MS);
 	                    }, true);
 	                };
-	                const toAsciiAcronym = (text, maxLen = 2) => {
-	                    const letters = String(text || "").match(/[A-Za-z]+/g);
-	                    if (!letters || !letters.length) return "";
-	                    return letters.join("").toUpperCase().slice(0, Math.max(1, Number(maxLen) || 2));
-	                };
 	                const getRoleBadgeAbbrevText = (tag, level) => {
 	                    const raw = getRoleBadgeRawText(tag);
 	                    const lower = raw.toLowerCase();
 	                    if (!raw) return "";
+	                    const iconOnly = level >= 2;
 	                    if (tag.classList?.contains?.("nsx-op-badge")) {
-	                        if (level >= 2) return "OP";
+	                        if (iconOnly) return "👤";
 	                        return raw;
 	                    }
 	                    if (tag.classList?.contains?.("nsx-oneman-badge") || /oneman/i.test(raw)) {
-	                        if (level >= 2) return "OM";
+	                        if (iconOnly) return "①";
 	                        return raw;
 	                    }
 	                    if (tag.classList?.contains?.("nsx-admin-badge") || /admin|mod|管理|版主/.test(lower) || /管理|版主/.test(raw)) {
-	                        if (level >= 2) return "AD";
+	                        if (iconOnly) return "🛡";
 	                        return raw;
 	                    }
 	                    if (tag.classList?.contains?.("nsx-owner-badge") || /owner|频道/.test(lower) || /频道/.test(raw)) {
-	                        if (level >= 2) return "CH";
+	                        if (iconOnly) return "📡";
 	                        return raw;
 	                    }
 	                    if (tag.classList?.contains?.("nsx-blogger-badge") || /博主/.test(raw)) {
-	                        if (level >= 2) return "BG";
+	                        if (iconOnly) return "✍";
 	                        return raw;
 	                    }
 	                    if (tag.classList?.contains?.("nsx-dev-badge") || /dev|开发/.test(lower) || /开发/.test(raw)) {
-	                        if (level >= 2) return "DV";
+	                        if (iconOnly) return "⚙";
 	                        return raw;
 	                    }
 	                    if (tag.classList?.contains?.("nsx-detective-badge") || /侦探/.test(raw) || /detective/.test(lower)) {
-	                        if (level >= 2) return "侦探";
+	                        if (iconOnly) return "🔎";
 	                        return raw;
 	                    }
 	                    if (tag.classList?.contains?.("nsx-broker-badge") || /交易中介|中介/.test(raw) || /tradebroker|broker/.test(lower)) {
-	                        if (level >= 2) return "中介";
+	                        if (iconOnly) return "🤝";
 	                        return raw;
 	                    }
-	                    const latin = toAsciiAcronym(raw, 2);
-	                    if (level >= 2) return latin.length === 2 ? latin : (latin.length === 1 ? `${latin}X` : "TG");
+	                    if (iconOnly) return "🏷";
 	                    return raw;
 	                };
 	                const autoAbbrevRoleBadges = (authorInfo, shouldCompact) => {
