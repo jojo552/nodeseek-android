@@ -2,8 +2,10 @@ package com.nodeseek.app;
 
 import android.app.Activity;
 import android.annotation.SuppressLint;
+import android.Manifest;
 import android.content.ClipData;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -36,6 +38,7 @@ import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import com.nodeseek.app.notify.NotificationScheduler;
 import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.regex.Matcher;
@@ -43,6 +46,7 @@ import java.util.regex.Pattern;
 
 public class MainActivity extends Activity {
     private static final String BASELINE_TAG = "NS_BASELINE";
+    public static final String EXTRA_TARGET_URL = "extra_target_url";
     private static final String URL_HOME = "https://www.nodeseek.com/";
     private static final String HOST_PRIMARY = "www.nodeseek.com";
     private static final String HOST_FALLBACK = "nodeseek.com";
@@ -52,6 +56,7 @@ public class MainActivity extends Activity {
     private static final long WEB_THEME_SYNC_RESUME_DELAY_MS = 220L;
     private static final long WEB_THEME_SYNC_AFTER_CLICK_DELAY_MS = 280L;
     private static final int REQUEST_CODE_FILE_CHOOSER = 61201;
+    private static final int REQUEST_CODE_POST_NOTIFICATIONS = 61202;
     private static final int DEFAULT_STATUS_BAR_COLOR_LIGHT = 0xFFFFFFFF;
     private static final int DEFAULT_STATUS_BAR_COLOR_DARK = 0xFF121212;
     private static final Pattern URL_IN_TEXT_PATTERN = Pattern.compile("(https?://\\S+)");
@@ -89,6 +94,8 @@ public class MainActivity extends Activity {
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         applyStatusBarScrimColor(getDefaultStatusBarColor());
         registerBackNavigationCallback();
+        NotificationScheduler.ensureScheduled(getApplicationContext());
+        ensureNotificationPermission();
         if (!restoreWebViewState(savedInstanceState)) {
             webContent.loadUrl(resolveLaunchUrl(getIntent()));
         }
@@ -177,6 +184,11 @@ public class MainActivity extends Activity {
             @Override
             public void onPageFinished(WebView view, String url) {
                 NodeseekUserscriptRuntime.inject(MainActivity.this, view, url);
+                NotificationScheduler.syncSessionFromPage(
+                    MainActivity.this,
+                    url,
+                    view.getSettings().getUserAgentString()
+                );
                 stopRefreshingIndicator();
                 syncWebThemeWithSystem();
                 syncStatusBarWithPage();
@@ -330,6 +342,10 @@ public class MainActivity extends Activity {
         if (intent == null) {
             return URL_HOME;
         }
+        String targetUrl = extractNotificationTargetUrl(intent);
+        if (targetUrl != null) {
+            return targetUrl;
+        }
         String action = intent.getAction();
         if (Intent.ACTION_VIEW.equals(action)) {
             return normalizeIncomingUrl(intent.getData());
@@ -352,8 +368,32 @@ public class MainActivity extends Activity {
         if (intent == null) {
             return false;
         }
+        if (extractNotificationTargetUrl(intent) != null) {
+            return true;
+        }
         String action = intent.getAction();
         return Intent.ACTION_VIEW.equals(action) || Intent.ACTION_SEND.equals(action);
+    }
+
+    private String extractNotificationTargetUrl(Intent intent) {
+        if (intent == null) {
+            return null;
+        }
+        String raw = intent.getStringExtra(EXTRA_TARGET_URL);
+        if (raw == null || raw.trim().isEmpty()) {
+            return null;
+        }
+        Uri uri;
+        try {
+            uri = Uri.parse(raw.trim());
+        } catch (Exception ignored) {
+            return null;
+        }
+        String normalized = normalizeIncomingUrl(uri);
+        if (URL_HOME.equals(normalized) && !URL_HOME.equals(raw.trim())) {
+            return null;
+        }
+        return normalized;
     }
 
     private boolean restoreWebViewState(Bundle savedInstanceState) {
@@ -779,6 +819,23 @@ public class MainActivity extends Activity {
         stopRefreshingIndicator();
         textEmpty.setText(getString(R.string.error_load_posts, message));
         textEmpty.setVisibility(View.VISIBLE);
+    }
+
+    private void ensureNotificationPermission() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            return;
+        }
+        if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS)
+            == PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        try {
+            requestPermissions(
+                new String[] {Manifest.permission.POST_NOTIFICATIONS},
+                REQUEST_CODE_POST_NOTIFICATIONS
+            );
+        } catch (Exception ignored) {
+        }
     }
 
     private void startRefreshingIndicator() {
