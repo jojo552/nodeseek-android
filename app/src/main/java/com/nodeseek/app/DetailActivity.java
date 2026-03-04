@@ -24,7 +24,6 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
-import com.nodeseek.app.notify.NotificationScheduler;
 
 public class DetailActivity extends Activity {
     public static final String EXTRA_POST_URL = "extra_post_url";
@@ -69,7 +68,6 @@ public class DetailActivity extends Activity {
         applyInsets();
         setupWebView();
         registerBackNavigationCallback();
-        NotificationScheduler.ensureScheduled(getApplicationContext());
 
         backButton.setOnClickListener(v -> onBackPressedCompat());
         externalButton.setOnClickListener(v -> openExternalCurrentUrl());
@@ -127,11 +125,6 @@ public class DetailActivity extends Activity {
             @Override
             public void onPageFinished(WebView view, String url) {
                 NodeseekUserscriptRuntime.inject(DetailActivity.this, view, url);
-                NotificationScheduler.syncSessionFromPage(
-                    DetailActivity.this,
-                    url,
-                    view.getSettings().getUserAgentString()
-                );
                 loadingView.setVisibility(View.GONE);
             }
 
