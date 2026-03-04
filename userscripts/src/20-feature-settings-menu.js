@@ -1967,9 +1967,18 @@ body.dark-layout .nsx-sheet-item[data-a="filter"] .nsx-sheet-item-icon,html.dark
 			                }
 			            `);
 
-			            const detectCornerBadgesInHost = (host) => {
-			                const badges = [];
-			                if (!host || host.nodeType !== 1) return badges;
+		            const detectCornerBadgesInHost = (host) => {
+		                const badges = [];
+		                if (!host || host.nodeType !== 1) return badges;
+
+		                const isTitleAreaNode = (el) => {
+		                    if (!el || el.nodeType !== 1) return false;
+		                    try {
+		                        return !!el.closest?.(".post-title,.post-title-wrap,.post-content-title,.topic-title,.topic-subject");
+		                    } catch {
+		                        return false;
+		                    }
+		                };
 
 		                const seen = new Set();
 		                const push = (el, type) => {
@@ -1981,19 +1990,27 @@ body.dark-layout .nsx-sheet-item[data-a="filter"] .nsx-sheet-item-icon,html.dark
 		                        const floorLink = floorWrap.querySelector?.("a.floor-link,a[href^=\"#\"]");
 		                        if (floorLink && (el === floorLink || floorLink.contains?.(el))) return;
 		                    }
+		                    // 标题区图标维持站点原生样式：避免置顶图标挤占标题宽度触发换行。
+		                    if (isTitleAreaNode(el)) return;
 		                    if (seen.has(el)) return;
 		                    if (type !== "hot" && type !== "pin") return;
+		                    // 去重：同一角标父子节点只保留外层节点，避免出现“图标嵌套”样式。
+		                    for (const item of badges) {
+		                        const picked = item?.el;
+		                        if (!picked || picked === el) continue;
+		                        if (picked.contains?.(el)) return;
+		                    }
+		                    for (let i = badges.length - 1; i >= 0; i -= 1) {
+		                        const picked = badges[i]?.el;
+		                        if (!picked || picked === el) continue;
+		                        if (el.contains?.(picked)) {
+		                            seen.delete(picked);
+		                            badges.splice(i, 1);
+		                        }
+		                    }
 		                    seen.add(el);
 		                    badges.push({ el, type });
 		                };
-
-		                // 先收集已标记的角标，避免重复扫描导致“找不到角标”而误恢复 padding
-		                try {
-		                    host.querySelectorAll?.("[data-nsx-corner-badge]")?.forEach?.(el => {
-		                        const type = el?.dataset?.nsxCornerBadge;
-		                        if (type) push(el, type);
-		                    });
-		                } catch { }
 
 		                // HOT：按文本精确匹配（避免误伤正文中的 “hot”）
 		                try {
@@ -2176,9 +2193,22 @@ body.dark-layout .nsx-sheet-item[data-a="filter"] .nsx-sheet-item-icon,html.dark
 		                try { host.classList.remove("nsx-has-corner-badge"); } catch { }
 		            };
 
+		            const resetCornerBadgeMarksInHost = (host) => {
+		                if (!host || host.nodeType !== 1) return;
+		                try {
+		                    host.querySelectorAll?.(".nsx-corner-badge,[data-nsx-corner-badge]")?.forEach?.((el) => {
+		                        if (!el || el.nodeType !== 1) return;
+		                        try { el.classList.remove("nsx-corner-badge", "nsx-hot-badge", "nsx-pin-badge"); } catch { }
+		                        try { delete el.dataset.nsxCornerBadge; } catch { }
+		                        try { delete el.dataset.nsxCornerLabel; } catch { }
+		                    });
+		                } catch { }
+		            };
+
 		            const applyCornerBadgeSafePadding = (host) => {
 		                if (!host || host.nodeType !== 1) return;
 		                restoreHiddenCornerBadgesInHost(host);
+		                resetCornerBadgeMarksInHost(host);
 
 		                const found = detectCornerBadgesInHost(host);
 		                if (!found.length) {
