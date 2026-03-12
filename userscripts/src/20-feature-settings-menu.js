@@ -4349,7 +4349,6 @@ body.dark-layout .nsx-sheet-item[data-a="filter"] .nsx-sheet-item-icon,html.dark
             init(ctx) {
                 const mark = new WeakSet();
                 const selector = ".post-list-item .post-title > a, .post-list .post-title > a";
-                let menuEl = null;
                 const pressDurationRaw = Number(ctx.store.get("title_long_press_copy.duration_ms", 480));
                 const pressDuration = Number.isFinite(pressDurationRaw)
                     ? Math.min(1200, Math.max(280, pressDurationRaw))
@@ -4365,97 +4364,16 @@ body.dark-layout .nsx-sheet-item[data-a="filter"] .nsx-sheet-item-icon,html.dark
                     }
                 };
 
-                const cleanupMenu = () => {
-                    if (!menuEl) return;
-                    menuEl.remove();
-                    menuEl = null;
-                    document.removeEventListener("pointerdown", onPointerDownCapture, true);
-                    document.removeEventListener("scroll", cleanupMenu, true);
-                    window.removeEventListener("resize", cleanupMenu);
-                };
-
-                const onPointerDownCapture = (event) => {
-                    if (!menuEl) return;
-                    if (menuEl.contains(event.target)) return;
-                    cleanupMenu();
-                };
-
-                const copyWithExecCommand = (raw) => {
-                    const text = String(raw || "");
-                    if (!text) return false;
+                const showNativeMenu = (title, link) => {
+                    if (!title && !link) return false;
                     try {
-                        const input = document.createElement("textarea");
-                        input.value = text;
-                        input.setAttribute("readonly", "readonly");
-                        input.style.position = "fixed";
-                        input.style.opacity = "0";
-                        input.style.left = "-9999px";
-                        input.style.top = "-9999px";
-                        document.body.appendChild(input);
-                        input.select();
-                        input.setSelectionRange(0, input.value.length);
-                        const ok = !!document.execCommand?.("copy");
-                        input.remove();
-                        return ok;
-                    } catch {
-                        return false;
-                    }
-                };
-
-                const copyText = async (raw) => {
-                    const text = String(raw || "");
-                    if (!text) return false;
-                    try {
-                        if (navigator.clipboard?.writeText) {
-                            await navigator.clipboard.writeText(text);
+                        if (window.NSXBridge?.showTitleLongPressMenu) {
+                            window.NSXBridge.showTitleLongPressMenu(String(title || ""), String(link || ""));
                             return true;
                         }
-                    } catch { }
-                    return copyWithExecCommand(text);
-                };
-
-                const showMenu = (title, link, x, y) => {
-                    cleanupMenu();
-                    const hasTitle = !!title;
-                    const hasLink = !!link;
-                    if (!hasTitle && !hasLink) return;
-
-                    const panel = document.createElement("div");
-                    panel.className = "nsx-title-long-press-menu";
-                    panel.innerHTML = `
-                        <button type="button" data-copy="title" ${hasTitle ? "" : "disabled"}>复制标题</button>
-                        <button type="button" data-copy="link" ${hasLink ? "" : "disabled"}>复制链接</button>
-                    `;
-                    panel.addEventListener("click", async (event) => {
-                        const btn = event.target.closest("button[data-copy]");
-                        if (!btn || btn.disabled) return;
-                        const copyType = btn.dataset.copy;
-                        const text = copyType === "title" ? title : link;
-                        const ok = await copyText(text);
-                        if (ok) {
-                            ctx.ui?.success?.(copyType === "title" ? "标题已复制" : "链接已复制");
-                        } else {
-                            ctx.ui?.warning?.("复制失败，请手动复制");
-                        }
-                        cleanupMenu();
-                    });
-                    document.body.appendChild(panel);
-                    menuEl = panel;
-
-                    const rect = panel.getBoundingClientRect();
-                    const vw = window.innerWidth || document.documentElement.clientWidth || 360;
-                    const vh = window.innerHeight || document.documentElement.clientHeight || 640;
-                    const gap = 8;
-                    const targetX = Math.min(Math.max(gap, x - rect.width / 2), vw - rect.width - gap);
-                    const targetY = Math.min(Math.max(gap, y - rect.height / 2), vh - rect.height - gap);
-                    panel.style.left = `${targetX}px`;
-                    panel.style.top = `${targetY}px`;
-
-                    setTimeout(() => {
-                        document.addEventListener("pointerdown", onPointerDownCapture, true);
-                    }, 0);
-                    document.addEventListener("scroll", cleanupMenu, true);
-                    window.addEventListener("resize", cleanupMenu);
+                    } catch {
+                    }
+                    return false;
                 };
 
                 const bindLinks = (els) => {
@@ -4483,8 +4401,10 @@ body.dark-layout .nsx-sheet-item[data-a="filter"] .nsx-sheet-item-icon,html.dark
                             const href = toAbsoluteUrl(link.getAttribute("href"));
                             if (!title && !href) return;
                             timer = setTimeout(() => {
-                                link.setAttribute(consumedAttr, String(Date.now() + 900));
-                                showMenu(title, href, x, y);
+                                const opened = showNativeMenu(title, href);
+                                if (opened) {
+                                    link.setAttribute(consumedAttr, String(Date.now() + 900));
+                                }
                             }, pressDuration);
                         };
 
@@ -4533,15 +4453,6 @@ body.dark-layout .nsx-sheet-item[data-a="filter"] .nsx-sheet-item-icon,html.dark
                         }, true);
                     });
                 };
-
-                addStyle("nsx-title-long-press-menu-style", `
-                .nsx-title-long-press-menu{position:fixed;z-index:2147483646;display:flex;flex-direction:column;gap:6px;padding:8px;min-width:128px;border-radius:12px;border:1px solid rgba(15,23,42,.16);background:rgba(255,255,255,.98);box-shadow:0 10px 26px rgba(15,23,42,.22);backdrop-filter:blur(2px)}
-                .nsx-title-long-press-menu button{appearance:none;border:1px solid rgba(59,130,246,.24);background:rgba(239,246,255,.94);color:#1e40af;border-radius:9px;padding:8px 10px;font-size:13px;font-weight:700;text-align:left;cursor:pointer}
-                .nsx-title-long-press-menu button:active{transform:translateY(1px)}
-                .nsx-title-long-press-menu button[disabled]{opacity:.52;cursor:not-allowed}
-                body.dark-layout .nsx-title-long-press-menu,html.dark .nsx-title-long-press-menu{background:rgba(15,23,42,.95);border-color:rgba(148,163,184,.28);box-shadow:0 10px 30px rgba(2,6,23,.55)}
-                body.dark-layout .nsx-title-long-press-menu button,html.dark .nsx-title-long-press-menu button{background:rgba(30,64,175,.30);border-color:rgba(96,165,250,.36);color:#bfdbfe}
-                `);
 
                 bindLinks(document.querySelectorAll(selector));
                 ctx.watch(selector, bindLinks, { debounce: 100 });

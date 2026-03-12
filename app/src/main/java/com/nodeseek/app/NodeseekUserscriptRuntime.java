@@ -1,6 +1,9 @@
 package com.nodeseek.app;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -19,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -63,7 +67,7 @@ public final class NodeseekUserscriptRuntime {
         if (activity == null || webView == null) {
             return;
         }
-        webView.addJavascriptInterface(new Bridge(activity.getApplicationContext()), BRIDGE_NAME);
+        webView.addJavascriptInterface(new Bridge(activity), BRIDGE_NAME);
     }
 
     public static void inject(Activity activity, WebView webView, String url) {
@@ -421,14 +425,17 @@ public final class NodeseekUserscriptRuntime {
 
     private static final class Bridge {
         private final Context appContext;
+        private final WeakReference<Activity> activityRef;
         private final SharedPreferences prefs;
         private final Handler mainHandler = new Handler(Looper.getMainLooper());
         private final String defaultUserAgent;
+        private AlertDialog activeDialog;
 
-        Bridge(Context context) {
-            this.appContext = context;
-            this.prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-            this.defaultUserAgent = resolveDefaultUserAgent(context);
+        Bridge(Activity activity) {
+            this.appContext = activity.getApplicationContext();
+            this.activityRef = new WeakReference<>(activity);
+            this.prefs = appContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+            this.defaultUserAgent = resolveDefaultUserAgent(appContext);
         }
 
         private String resolveDefaultUserAgent(Context context) {
@@ -489,6 +496,93 @@ public final class NodeseekUserscriptRuntime {
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 appContext.startActivity(intent);
             } catch (Exception ignored) {
+            }
+        }
+
+        @JavascriptInterface
+        public void showTitleLongPressMenu(String title, String url) {
+            String safeTitle = title == null ? "" : title.trim();
+            String safeUrl = url == null ? "" : url.trim();
+            if (safeTitle.isEmpty() && safeUrl.isEmpty()) {
+                return;
+            }
+            mainHandler.post(() -> showTitleLongPressDialogInternal(safeTitle, safeUrl));
+        }
+
+        private void showTitleLongPressDialogInternal(String title, String url) {
+            Activity activity = activityRef.get();
+            if (activity == null || activity.isFinishing() || activity.isDestroyed()) {
+                return;
+            }
+
+            dismissActiveDialog();
+
+            String[] items;
+            String[] values;
+            String[] toastMessages;
+            if (!title.isEmpty() && !url.isEmpty()) {
+                items = new String[] { "复制标题", "复制链接" };
+                values = new String[] { title, url };
+                toastMessages = new String[] { "标题已复制", "链接已复制" };
+            } else if (!title.isEmpty()) {
+                items = new String[] { "复制标题" };
+                values = new String[] { title };
+                toastMessages = new String[] { "标题已复制" };
+            } else {
+                items = new String[] { "复制链接" };
+                values = new String[] { url };
+                toastMessages = new String[] { "链接已复制" };
+            }
+
+            AlertDialog dialog = new AlertDialog.Builder(activity)
+                .setTitle("复制帖子信息")
+                .setItems(items, (dialogInterface, which) -> {
+                    if (which < 0 || which >= values.length) {
+                        return;
+                    }
+                    boolean copied = copyToClipboard(values[which]);
+                    Toast.makeText(
+                        appContext,
+                        copied ? toastMessages[which] : "复制失败，请重试",
+                        Toast.LENGTH_SHORT
+                    ).show();
+                })
+                .setOnDismissListener(dialogInterface -> {
+                    if (activeDialog == dialogInterface) {
+                        activeDialog = null;
+                    }
+                })
+                .create();
+            activeDialog = dialog;
+            dialog.show();
+        }
+
+        private void dismissActiveDialog() {
+            if (activeDialog == null) {
+                return;
+            }
+            try {
+                activeDialog.dismiss();
+            } catch (Exception ignored) {
+            } finally {
+                activeDialog = null;
+            }
+        }
+
+        private boolean copyToClipboard(String text) {
+            if (text == null || text.trim().isEmpty()) {
+                return false;
+            }
+            try {
+                ClipboardManager clipboardManager =
+                    (ClipboardManager) appContext.getSystemService(Context.CLIPBOARD_SERVICE);
+                if (clipboardManager == null) {
+                    return false;
+                }
+                clipboardManager.setPrimaryClip(ClipData.newPlainText("nodeseek", text));
+                return true;
+            } catch (Exception ignored) {
+                return false;
             }
         }
 
