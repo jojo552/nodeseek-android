@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Base64;
+import android.view.ViewConfiguration;
 import android.webkit.JavascriptInterface;
 import android.webkit.CookieManager;
 import android.webkit.WebSettings;
@@ -496,6 +497,15 @@ public final class NodeseekUserscriptRuntime {
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 appContext.startActivity(intent);
             } catch (Exception ignored) {
+            }
+        }
+
+        @JavascriptInterface
+        public int getLongPressTimeoutMillis() {
+            try {
+                return Math.max(500, ViewConfiguration.getLongPressTimeout());
+            } catch (Exception ignored) {
+                return 500;
             }
         }
 

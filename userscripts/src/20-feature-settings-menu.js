@@ -4335,7 +4335,7 @@ body.dark-layout .nsx-sheet-item[data-a="filter"] .nsx-sheet-item-icon,html.dark
         const titleLongPressCopy = {
             id: "titleLongPressCopy",
             order: 388,
-            cfg: { title_long_press_copy: { enabled: true, duration_ms: 480 } },
+            cfg: { title_long_press_copy: { enabled: true, duration_ms: 600 } },
             meta: {
                 title_long_press_copy: {
                     label: "长按标题复制(标题/链接)",
@@ -4349,10 +4349,19 @@ body.dark-layout .nsx-sheet-item[data-a="filter"] .nsx-sheet-item-icon,html.dark
             init(ctx) {
                 const mark = new WeakSet();
                 const selector = ".post-list-item .post-title > a, .post-list .post-title > a";
-                const pressDurationRaw = Number(ctx.store.get("title_long_press_copy.duration_ms", 480));
-                const pressDuration = Number.isFinite(pressDurationRaw)
-                    ? Math.min(1200, Math.max(280, pressDurationRaw))
-                    : 480;
+                const pressDurationRaw = Number(ctx.store.get("title_long_press_copy.duration_ms", 600));
+                const configuredPressDuration = Number.isFinite(pressDurationRaw)
+                    ? Math.min(1500, Math.max(320, pressDurationRaw))
+                    : 600;
+                const nativePressDuration = (() => {
+                    try {
+                        const value = Number(window.NSXBridge?.getLongPressTimeoutMillis?.());
+                        return Number.isFinite(value) ? value : 0;
+                    } catch {
+                        return 0;
+                    }
+                })();
+                const pressDuration = Math.max(configuredPressDuration, nativePressDuration);
 
                 const normalize = (text) => String(text || "").replace(/\s+/g, " ").trim();
 
