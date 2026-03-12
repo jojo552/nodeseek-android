@@ -4330,6 +4330,226 @@ body.dark-layout .nsx-sheet-item[data-a="filter"] .nsx-sheet-item-icon,html.dark
         define(imageUpload);
 
         /* ==========================================================================
+           [ 🧭 辅助工具 ] - 长按帖子标题复制（标题 / 链接）
+           ========================================================================== */
+        const titleLongPressCopy = {
+            id: "titleLongPressCopy",
+            order: 388,
+            cfg: { title_long_press_copy: { enabled: true, duration_ms: 480 } },
+            meta: {
+                title_long_press_copy: {
+                    label: "长按标题复制(标题/链接)",
+                    group: "🧭 辅助工具",
+                    fields: {
+                        duration_ms: { type: "NUMBER", label: "长按触发时长(ms)", valueType: "number" }
+                    }
+                }
+            },
+            match: ctx => (ctx.isList || ctx.isPost) && ctx.store.get("title_long_press_copy.enabled", true),
+            init(ctx) {
+                const mark = new WeakSet();
+                const selector = ".post-list-item .post-title > a, .post-list .post-title > a";
+                let menuEl = null;
+                const pressDurationRaw = Number(ctx.store.get("title_long_press_copy.duration_ms", 480));
+                const pressDuration = Number.isFinite(pressDurationRaw)
+                    ? Math.min(1200, Math.max(280, pressDurationRaw))
+                    : 480;
+
+                const normalize = (text) => String(text || "").replace(/\s+/g, " ").trim();
+
+                const toAbsoluteUrl = (href) => {
+                    try {
+                        return new URL(String(href || ""), location.href).href;
+                    } catch {
+                        return "";
+                    }
+                };
+
+                const cleanupMenu = () => {
+                    if (!menuEl) return;
+                    menuEl.remove();
+                    menuEl = null;
+                    document.removeEventListener("pointerdown", onPointerDownCapture, true);
+                    document.removeEventListener("scroll", cleanupMenu, true);
+                    window.removeEventListener("resize", cleanupMenu);
+                };
+
+                const onPointerDownCapture = (event) => {
+                    if (!menuEl) return;
+                    if (menuEl.contains(event.target)) return;
+                    cleanupMenu();
+                };
+
+                const copyWithExecCommand = (raw) => {
+                    const text = String(raw || "");
+                    if (!text) return false;
+                    try {
+                        const input = document.createElement("textarea");
+                        input.value = text;
+                        input.setAttribute("readonly", "readonly");
+                        input.style.position = "fixed";
+                        input.style.opacity = "0";
+                        input.style.left = "-9999px";
+                        input.style.top = "-9999px";
+                        document.body.appendChild(input);
+                        input.select();
+                        input.setSelectionRange(0, input.value.length);
+                        const ok = !!document.execCommand?.("copy");
+                        input.remove();
+                        return ok;
+                    } catch {
+                        return false;
+                    }
+                };
+
+                const copyText = async (raw) => {
+                    const text = String(raw || "");
+                    if (!text) return false;
+                    try {
+                        if (navigator.clipboard?.writeText) {
+                            await navigator.clipboard.writeText(text);
+                            return true;
+                        }
+                    } catch { }
+                    return copyWithExecCommand(text);
+                };
+
+                const showMenu = (title, link, x, y) => {
+                    cleanupMenu();
+                    const hasTitle = !!title;
+                    const hasLink = !!link;
+                    if (!hasTitle && !hasLink) return;
+
+                    const panel = document.createElement("div");
+                    panel.className = "nsx-title-long-press-menu";
+                    panel.innerHTML = `
+                        <button type="button" data-copy="title" ${hasTitle ? "" : "disabled"}>复制标题</button>
+                        <button type="button" data-copy="link" ${hasLink ? "" : "disabled"}>复制链接</button>
+                    `;
+                    panel.addEventListener("click", async (event) => {
+                        const btn = event.target.closest("button[data-copy]");
+                        if (!btn || btn.disabled) return;
+                        const copyType = btn.dataset.copy;
+                        const text = copyType === "title" ? title : link;
+                        const ok = await copyText(text);
+                        if (ok) {
+                            ctx.ui?.success?.(copyType === "title" ? "标题已复制" : "链接已复制");
+                        } else {
+                            ctx.ui?.warning?.("复制失败，请手动复制");
+                        }
+                        cleanupMenu();
+                    });
+                    document.body.appendChild(panel);
+                    menuEl = panel;
+
+                    const rect = panel.getBoundingClientRect();
+                    const vw = window.innerWidth || document.documentElement.clientWidth || 360;
+                    const vh = window.innerHeight || document.documentElement.clientHeight || 640;
+                    const gap = 8;
+                    const targetX = Math.min(Math.max(gap, x - rect.width / 2), vw - rect.width - gap);
+                    const targetY = Math.min(Math.max(gap, y - rect.height / 2), vh - rect.height - gap);
+                    panel.style.left = `${targetX}px`;
+                    panel.style.top = `${targetY}px`;
+
+                    setTimeout(() => {
+                        document.addEventListener("pointerdown", onPointerDownCapture, true);
+                    }, 0);
+                    document.addEventListener("scroll", cleanupMenu, true);
+                    window.addEventListener("resize", cleanupMenu);
+                };
+
+                const bindLinks = (els) => {
+                    els.forEach((link) => {
+                        if (!(link instanceof HTMLAnchorElement)) return;
+                        if (mark.has(link)) return;
+                        mark.add(link);
+
+                        let timer = 0;
+                        let startX = 0;
+                        let startY = 0;
+                        const consumedAttr = "data-nsx-long-press-until";
+
+                        const clearTimer = () => {
+                            if (!timer) return;
+                            clearTimeout(timer);
+                            timer = 0;
+                        };
+
+                        const startTimer = (x, y) => {
+                            clearTimer();
+                            startX = x;
+                            startY = y;
+                            const title = normalize(link.textContent);
+                            const href = toAbsoluteUrl(link.getAttribute("href"));
+                            if (!title && !href) return;
+                            timer = setTimeout(() => {
+                                link.setAttribute(consumedAttr, String(Date.now() + 900));
+                                showMenu(title, href, x, y);
+                            }, pressDuration);
+                        };
+
+                        const cancelWhenMoved = (x, y) => {
+                            if (!timer) return;
+                            if (Math.abs(x - startX) > 12 || Math.abs(y - startY) > 12) {
+                                clearTimer();
+                            }
+                        };
+
+                        link.addEventListener("touchstart", (event) => {
+                            if (!event.touches || event.touches.length !== 1) return;
+                            const t = event.touches[0];
+                            startTimer(t.clientX, t.clientY);
+                        }, { passive: true });
+                        link.addEventListener("touchmove", (event) => {
+                            const t = event.touches?.[0];
+                            if (!t) return;
+                            cancelWhenMoved(t.clientX, t.clientY);
+                        }, { passive: true });
+                        link.addEventListener("touchend", clearTimer, { passive: true });
+                        link.addEventListener("touchcancel", clearTimer, { passive: true });
+
+                        link.addEventListener("mousedown", (event) => {
+                            if (event.button !== 0) return;
+                            startTimer(event.clientX, event.clientY);
+                        });
+                        link.addEventListener("mousemove", (event) => cancelWhenMoved(event.clientX, event.clientY));
+                        link.addEventListener("mouseup", clearTimer);
+                        link.addEventListener("mouseleave", clearTimer);
+                        link.addEventListener("dragstart", clearTimer);
+
+                        link.addEventListener("click", (event) => {
+                            const until = Number(link.getAttribute(consumedAttr) || "0");
+                            if (until <= Date.now()) return;
+                            event.preventDefault();
+                            event.stopPropagation();
+                            clearTimer();
+                        }, true);
+
+                        link.addEventListener("contextmenu", (event) => {
+                            const until = Number(link.getAttribute(consumedAttr) || "0");
+                            if (until <= Date.now()) return;
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }, true);
+                    });
+                };
+
+                addStyle("nsx-title-long-press-menu-style", `
+                .nsx-title-long-press-menu{position:fixed;z-index:2147483646;display:flex;flex-direction:column;gap:6px;padding:8px;min-width:128px;border-radius:12px;border:1px solid rgba(15,23,42,.16);background:rgba(255,255,255,.98);box-shadow:0 10px 26px rgba(15,23,42,.22);backdrop-filter:blur(2px)}
+                .nsx-title-long-press-menu button{appearance:none;border:1px solid rgba(59,130,246,.24);background:rgba(239,246,255,.94);color:#1e40af;border-radius:9px;padding:8px 10px;font-size:13px;font-weight:700;text-align:left;cursor:pointer}
+                .nsx-title-long-press-menu button:active{transform:translateY(1px)}
+                .nsx-title-long-press-menu button[disabled]{opacity:.52;cursor:not-allowed}
+                body.dark-layout .nsx-title-long-press-menu,html.dark .nsx-title-long-press-menu{background:rgba(15,23,42,.95);border-color:rgba(148,163,184,.28);box-shadow:0 10px 30px rgba(2,6,23,.55)}
+                body.dark-layout .nsx-title-long-press-menu button,html.dark .nsx-title-long-press-menu button{background:rgba(30,64,175,.30);border-color:rgba(96,165,250,.36);color:#bfdbfe}
+                `);
+
+                bindLinks(document.querySelectorAll(selector));
+                ctx.watch(selector, bindLinks, { debounce: 100 });
+            }
+        };
+        define(titleLongPressCopy);
+
+        /* ==========================================================================
            [ 🧭 辅助工具 ] - 新标签页打开链接修复
            ========================================================================== */
         const openInNewTabFix = {
